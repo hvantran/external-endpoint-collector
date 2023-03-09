@@ -21,7 +21,7 @@ import com.hoatv.fwk.common.ultilities.ObjectUtils;
 import com.hoatv.metric.mgmt.annotations.Metric;
 import com.hoatv.metric.mgmt.annotations.MetricProvider;
 import com.hoatv.metric.mgmt.entities.SimpleValue;
-import com.hoatv.monitor.mgmt.TimingMonitor;
+import com.hoatv.monitor.mgmt.TimingMetricMonitor;
 import com.hoatv.system.health.metrics.MethodStatisticCollector;
 import com.hoatv.task.mgmt.entities.TaskEntry;
 import com.hoatv.task.mgmt.services.TaskFactory;
@@ -167,7 +167,7 @@ public class ExtRestDataService {
     }
 
 
-    @TimingMonitor
+    @TimingMetricMonitor
     public List<EndpointResponseVO> getEndpointResponses(String application, Pageable pageable) {
         List<EndpointSetting> endpointSettings = extEndpointSettingRepository.findEndpointConfigsByApplication(
                 application, PageRequest.of(0, 10));
@@ -179,7 +179,7 @@ public class ExtRestDataService {
         return responses.stream().map(EndpointResponse::toEndpointResponseVO).collect(Collectors.toList());
     }
 
-    @TimingMonitor
+    @TimingMetricMonitor
     public List<EndpointSettingVO> getAllExtEndpoints(String application, Pageable pageable) {
         List<EndpointSetting> endpointConfigsByApplication = extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
         return endpointConfigsByApplication.stream().map(EndpointSetting::toEndpointConfigVO).collect(Collectors.toList());
