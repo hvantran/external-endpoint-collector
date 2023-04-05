@@ -5,9 +5,9 @@ import com.hoatv.ext.endpoint.dtos.EndpointSettingVO.DataGeneratorInfoVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO.Filter;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO.Input;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO.RequestInfoVO;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 

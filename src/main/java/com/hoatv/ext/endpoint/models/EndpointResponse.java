@@ -1,9 +1,9 @@
 package com.hoatv.ext.endpoint.models;
 
 import com.hoatv.ext.endpoint.dtos.EndpointResponseVO;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @Entity
 @Getter

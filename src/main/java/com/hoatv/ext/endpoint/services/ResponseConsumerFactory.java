@@ -3,9 +3,9 @@ package com.hoatv.ext.endpoint.services;
 import com.hoatv.ext.endpoint.api.ResponseConsumer;
 import com.hoatv.ext.endpoint.api.ResponseConsumerType;
 import com.hoatv.ext.endpoint.repositories.ExtEndpointResponseRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.EnumMap;
 import java.util.Map;
 
