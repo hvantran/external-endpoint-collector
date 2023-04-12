@@ -1,3 +1,4 @@
+/*
 package com.hoatv.ext.endpoint.config;
 
 import org.springframework.context.annotation.Bean;
@@ -40,4 +41,4 @@ public class SecurityConfig {
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         return http.build();
     }
-}
+}*/

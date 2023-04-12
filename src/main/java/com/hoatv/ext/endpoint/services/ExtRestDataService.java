@@ -28,6 +28,7 @@ import com.hoatv.task.mgmt.services.TaskFactory;
 import com.hoatv.task.mgmt.services.TaskMgmtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -168,20 +169,24 @@ public class ExtRestDataService {
 
 
     @TimingMetricMonitor
-    public List<EndpointResponseVO> getEndpointResponses(String application, Pageable pageable) {
-        List<EndpointSetting> endpointSettings = extEndpointSettingRepository.findEndpointConfigsByApplication(
+    public Page<EndpointResponseVO> getEndpointResponses(String application, Pageable pageable) {
+        Page<EndpointSetting> endpointSettings = extEndpointSettingRepository.findEndpointConfigsByApplication(
                 application, PageRequest.of(0, 10));
         if (endpointSettings.isEmpty()) {
-            return Collections.emptyList();
+            return Page.empty();
         }
-        List<EndpointResponse> responses = endpointResponseRepository.findEndpointResponsesByEndpointSettingIn(
-                endpointSettings, pageable);
-        return responses.stream().map(EndpointResponse::toEndpointResponseVO).collect(Collectors.toList());
+        Page<EndpointResponse> responses = endpointResponseRepository.findEndpointResponsesByEndpointSettingIn(
+                endpointSettings.stream().toList(), pageable);
+        return responses.map(EndpointResponse::toEndpointResponseVO);
     }
 
     @TimingMetricMonitor
-    public List<EndpointSettingVO> getAllExtEndpoints(String application, Pageable pageable) {
-        List<EndpointSetting> endpointConfigsByApplication = extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
-        return endpointConfigsByApplication.stream().map(EndpointSetting::toEndpointConfigVO).collect(Collectors.toList());
+    public Page<EndpointSettingVO> getAllExtEndpoints(String application, Pageable pageable) {
+        if (Objects.isNull(application)) {
+            return extEndpointSettingRepository.findAll(pageable).map(EndpointSetting::toEndpointConfigVO);
+        }
+        Page<EndpointSetting> endpointConfigsByApplication =
+                extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
+        return endpointConfigsByApplication.map(EndpointSetting::toEndpointConfigVO);
     }
 }
