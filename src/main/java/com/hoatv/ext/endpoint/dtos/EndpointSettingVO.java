@@ -4,17 +4,12 @@ import com.hoatv.ext.endpoint.api.ResponseConsumerType;
 import com.hoatv.ext.endpoint.utils.SaltGeneratorUtils;
 import com.hoatv.fwk.common.services.HttpClientService;
 import com.hoatv.springboot.common.validation.ValueOfEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.util.Map;
 
 @Getter
