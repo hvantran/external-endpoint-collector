@@ -82,7 +82,7 @@ public class ExtRestDataService {
         return new SimpleValue(numberOfErrorResponse.get());
     }
 
-    public void addExtEndpoint(EndpointSettingVO endpointSettingVO) {
+    public Long addExtEndpoint(EndpointSettingVO endpointSettingVO) {
         EndpointSetting endpointSetting = EndpointSetting.fromEndpointConfigVO(endpointSettingVO);
         HttpMethod extSupportedMethod = HttpMethod.fromString(endpointSetting.getMethod());
         ObjectUtils.checkThenThrow(Objects::isNull, extSupportedMethod, HttpMethod.INVALID_SUPPORTED_METHOD);
@@ -97,6 +97,7 @@ public class ExtRestDataService {
         taskMgmtExecutorV1.execute(mainTaskEntry);
 
         LOGGER.info("Endpoint {} is added successfully", endpointSetting.getExtEndpoint());
+        return endpointSetting.getId();
     }
 
     private Callable<Object> getEndpointResponseTasks(EndpointSetting endpointSetting, EndpointSettingVO endpointSettingVO) {

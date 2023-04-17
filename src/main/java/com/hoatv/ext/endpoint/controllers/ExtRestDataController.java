@@ -22,8 +22,8 @@ public class ExtRestDataController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addExtEndpoint(@Valid @RequestBody EndpointSettingVO endpointSettingVO) {
-        extRestDataService.addExtEndpoint(endpointSettingVO);
-        return ResponseEntity.noContent().build();
+        Long extEndpoint = extRestDataService.addExtEndpoint(endpointSettingVO);
+        return ResponseEntity.ok(String.format("{\"endpointId\": %s}", extEndpoint));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
