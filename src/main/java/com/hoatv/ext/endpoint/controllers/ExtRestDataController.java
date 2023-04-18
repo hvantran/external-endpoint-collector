@@ -6,6 +6,7 @@ import com.hoatv.ext.endpoint.services.ExtRestDataService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +31,9 @@ public class ExtRestDataController {
     public ResponseEntity<?> getAllExtEndpoints(@RequestParam(required = false) String application,
                                                 @RequestParam int pageIndex,
                                                 @RequestParam int pageSize) {
+        Sort defaultSorting = Sort.by(Sort.Order.asc("application"));
         Page<EndpointSettingVO> allExtEndpoints =
-                extRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize));
+                extRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(allExtEndpoints);
     }
 
@@ -45,8 +47,9 @@ public class ExtRestDataController {
     public ResponseEntity<?> getEndpointResponses(@PathVariable("endpointId") Long endpointId,
                                                   @RequestParam int pageIndex,
                                                   @RequestParam int pageSize) {
+        Sort defaultSorting = Sort.by(Sort.Order.asc("column1"));
         Page<EndpointResponseVO> endpointResponses =
-                extRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize));
+                extRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);
     }
 
@@ -54,8 +57,9 @@ public class ExtRestDataController {
     public ResponseEntity<?> getEndpointResponses(@PathVariable("application") String application,
                                                   @RequestParam int pageIndex,
                                                   @RequestParam int pageSize) {
+        Sort defaultSorting = Sort.by(Sort.Order.asc("column1"));
         Page<EndpointResponseVO> endpointResponses =
-                extRestDataService.getEndpointResponses(application, PageRequest.of(pageIndex, pageSize));
+                extRestDataService.getEndpointResponses(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);
     }
 }
