@@ -20,6 +20,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class EndpointSettingVO {
 
+    private Long endpointId;
+
     @Valid
     private Input input;
 

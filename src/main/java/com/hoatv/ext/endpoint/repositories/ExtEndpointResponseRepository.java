@@ -13,9 +13,9 @@ import java.util.List;
 @Repository
 @Transactional
 public interface ExtEndpointResponseRepository extends JpaRepository<EndpointResponse, Long> {
+    Page<EndpointResponse> findByEndpointSetting(EndpointSetting endpointSetting, Pageable pageable);
 
-    Page<EndpointResponse> findEndpointResponsesByEndpointSettingIn(List<EndpointSetting> endpointConfigSettings,
-                                                                    Pageable pageable);
+    Page<EndpointResponse> findByEndpointSettingIn(List<EndpointSetting> endpointConfigSettings, Pageable pageable);
     List<EndpointResponse> findEndpointResponsesByColumn3IsNotNullAndColumn10IsNull();
 
     boolean existsEndpointResponseByColumn1(String columnValue);

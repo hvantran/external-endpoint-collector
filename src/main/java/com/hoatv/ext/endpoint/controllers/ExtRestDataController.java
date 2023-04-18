@@ -35,7 +35,22 @@ public class ExtRestDataController {
         return ResponseEntity.ok(allExtEndpoints);
     }
 
-    @GetMapping(value = "/{application}/responses", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getEndpointResponses(@PathVariable("endpointId") Long endpointId) {
+        boolean isDeleted = extRestDataService.deleteEndpoint(endpointId);
+        return ResponseEntity.ok(String.format("{\"message\": %s}", isDeleted));
+    }
+
+    @GetMapping(value = "/{endpointId}/responses", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getEndpointResponses(@PathVariable("endpointId") Long endpointId,
+                                                  @RequestParam int pageIndex,
+                                                  @RequestParam int pageSize) {
+        Page<EndpointResponseVO> endpointResponses =
+                extRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize));
+        return ResponseEntity.ok(endpointResponses);
+    }
+
+    @GetMapping(value = "/{application}/responses-by-app-name", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getEndpointResponses(@PathVariable("application") String application,
                                                   @RequestParam int pageIndex,
                                                   @RequestParam int pageSize) {

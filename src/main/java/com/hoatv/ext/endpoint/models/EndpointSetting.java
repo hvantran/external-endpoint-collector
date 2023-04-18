@@ -94,9 +94,10 @@ public class EndpointSetting {
             .successCriteria(successCriteria)
             .build();
         return EndpointSettingVO.builder()
-            .input(input)
-            .filter(filter)
-            .build();
+                .endpointId(id)
+                .input(input)
+                .filter(filter)
+                .build();
     }
 
     public static EndpointSetting fromEndpointConfigVO(EndpointSettingVO endpointSettingVO) {

@@ -26,6 +26,7 @@ import com.hoatv.system.health.metrics.MethodStatisticCollector;
 import com.hoatv.task.mgmt.entities.TaskEntry;
 import com.hoatv.task.mgmt.services.TaskFactory;
 import com.hoatv.task.mgmt.services.TaskMgmtService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -165,6 +166,16 @@ public class ExtRestDataService {
         return TaskExecutionType.EXECUTE_WITH_COMPLETABLE_FUTURE.getExecutionTasks(executionContext);
     }
 
+    @TimingMetricMonitor
+    public Page<EndpointResponseVO> getEndpointResponses(Long endpointId, Pageable pageable) {
+        Optional<EndpointSetting> endpointSettingsOp = extEndpointSettingRepository.findById(endpointId);
+        EndpointSetting endpointSetting = endpointSettingsOp
+                .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)));
+        Page<EndpointResponse> responses = endpointResponseRepository.
+                findByEndpointSetting(endpointSetting, pageable);
+        return responses.map(EndpointResponse::toEndpointResponseVO);
+    }
+
 
     @TimingMetricMonitor
     public Page<EndpointResponseVO> getEndpointResponses(String application, Pageable pageable) {
@@ -173,7 +184,7 @@ public class ExtRestDataService {
         if (endpointSettings.isEmpty()) {
             return Page.empty();
         }
-        Page<EndpointResponse> responses = endpointResponseRepository.findEndpointResponsesByEndpointSettingIn(
+        Page<EndpointResponse> responses = endpointResponseRepository.findByEndpointSettingIn(
                 endpointSettings.stream().toList(), pageable);
         return responses.map(EndpointResponse::toEndpointResponseVO);
     }
@@ -186,5 +197,15 @@ public class ExtRestDataService {
         Page<EndpointSetting> endpointConfigsByApplication =
                 extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
         return endpointConfigsByApplication.map(EndpointSetting::toEndpointConfigVO);
+    }
+
+    @TimingMetricMonitor
+    public boolean deleteEndpoint(Long endpointId) {
+        Optional<EndpointSetting> endpointSettingsOp = extEndpointSettingRepository.findById(endpointId);
+        EndpointSetting endpointSetting = endpointSettingsOp
+                .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)));
+        extExecutionResultRepository.deleteByEndpointSetting(endpointSetting);
+        extEndpointSettingRepository.deleteById(endpointId);
+        return true;
     }
 }
