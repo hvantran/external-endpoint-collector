@@ -8,7 +8,10 @@
 *.ctxt
 
 **/*.iml
-/target/**
+**/target/**
+**/node_modules/**
+**/build/**
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
