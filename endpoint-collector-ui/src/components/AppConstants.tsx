@@ -11,16 +11,16 @@ export const SAMPLE_ENDPOINT_DATA: {[id: string]: any} = {
         <POST DATA>
 }`,
     "columnMetadata": `{
-    \"columnId\": \"column1\", 
-    \"columnMetadata\": [
-        {\"fieldPath\": \"random\", \"mappingColumnName\":\"column1\"}, 
-        {\"fieldPath\": \"$.data.user_id\", \"mappingColumnName\":\"column2\"}, 
-        {\"fieldPath\": \"$.data.access_token\", \"mappingColumnName\":\"column3\"}, 
-        {\"fieldPath\": \"$.data.email\", \"mappingColumnName\":\"column4\"},
-        {\"fieldPath\": \"$.data.time_created\", \"mappingColumnName\":\"column5\"},
-        {\"fieldPath\": \"$.data.time_expired\", \"mappingColumnName\":\"column6\"},
-        {\"fieldPath\": \"$.data.name\", \"mappingColumnName\":\"column7\"},
-        {\"fieldPath\": \"$.data.access_token\", \"decryptFunctionName\":\"decryptJWTBase64\", \"mappingColumnName\":\"column10\"}
+    "columnId": "column1", 
+    "columnMetadata": [
+        {"fieldPath": "random", "mappingColumnName":"column1"}, 
+        {"fieldPath": "$.data.user_id", "mappingColumnName":"column2"}, 
+        {"fieldPath": "$.data.access_token", "mappingColumnName":"column3"}, 
+        {"fieldPath": "$.data.email", "mappingColumnName":"column4"},
+        {"fieldPath": "$.data.time_created", "mappingColumnName":"column5"},
+        {"fieldPath": "$.data.time_expired", "mappingColumnName":"column6"},
+        {"fieldPath": "$.data.name", "mappingColumnName":"column7"},
+        {"fieldPath": "$.data.access_token", "decryptFunctionName":"decryptJWTBase64", "mappingColumnName":"column10"}
     ]
 }`,
     "generatorSaltLength": 10,
