@@ -1,4 +1,3 @@
-/*
 package com.hoatv.ext.endpoint.config;
 
 import org.springframework.context.annotation.Bean;
@@ -29,8 +28,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .requestMatchers("/**")
-                .hasRole("USER")
+                .requestMatchers("/ext-endpoint-collector/**")
+                .hasRole("BASIC")
                 .anyRequest()
                 .permitAll();
         http.oauth2Login()
@@ -41,4 +40,4 @@ public class SecurityConfig {
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         return http.build();
     }
-}*/
+}

@@ -1,4 +1,3 @@
-/*
 package com.hoatv.ext.endpoint.config;
 
 import org.slf4j.Logger;
@@ -26,8 +25,7 @@ public class KeycloakLogoutHandler implements LogoutHandler {
     }
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response,
-                       Authentication auth) {
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         logoutFromKeycloak((OidcUser) auth.getPrincipal());
     }
     private void logoutFromKeycloak(OidcUser user) {
@@ -44,4 +42,4 @@ public class KeycloakLogoutHandler implements LogoutHandler {
             logger.error("Could not propagate logout to Keycloak");
         }
     }
-}*/
+}
