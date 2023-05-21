@@ -178,7 +178,7 @@ export default function ExtEndpointDetails() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: () => () => loadExternalEndpointResponseAsync(pageIndex, pageSize)
+        onClick: ()  => loadExternalEndpointResponseAsync(pageIndex, pageSize)
       }
     ]
   }

@@ -220,7 +220,7 @@ export default function ExtEndpointSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh endpoints",
         actionName: "refreshAction",
-        onClick: () => () => loadEndpointSummaryAsync(pageIndex, pageSize)
+        onClick: ()  => loadEndpointSummaryAsync(pageIndex, pageSize)
       }
     ]
   }

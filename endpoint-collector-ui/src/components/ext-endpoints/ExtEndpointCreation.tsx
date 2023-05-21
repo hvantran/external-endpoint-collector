@@ -389,7 +389,7 @@ export default function ActionCreation() {
         actionIcon: <TimelapseIcon />,
         actionLabel: "Load sample",
         actionName: "loadSample",
-        onClick: () => () => {
+        onClick: ()  => {
           Object.keys(SAMPLE_ENDPOINT_DATA).forEach(propertyKey => {
             let propertyValue = SAMPLE_ENDPOINT_DATA[propertyKey]
             stepMetadatas[0].properties.filter(p => p.propName).forEach(p => {
@@ -415,7 +415,7 @@ export default function ActionCreation() {
         actionIcon: <ClearAllIcon />,
         actionLabel: "Clear sample",
         actionName: "clearAll",
-        onClick: () => () => {
+        onClick: ()  => {
           Object.keys(SAMPLE_ENDPOINT_DATA).forEach(propertyKey => {
             setStepMetadatas(onchangeStepDefault(propertyKey, ''))
           })
