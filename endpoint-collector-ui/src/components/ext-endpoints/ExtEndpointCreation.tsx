@@ -247,6 +247,24 @@ export default function ActionCreation() {
           }
         },
         {
+          propName: 'executorServiceType',
+          propLabel: 'Executor Service Type',
+          propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
+          propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
+          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+          labelElementProperties: { xs: 4 },
+          valueElementProperties: { xs: 8 },
+          propType: PropType.Selection,
+          selectionMeta: {
+            selections: ["EXECUTE_WITH_COMPLETABLE_FUTURE", "EXECUTE_WITH_EXECUTOR_SERVICE"],
+            onChangeEvent: function (event) {
+              let propValue = event.target.value;
+              let propName = event.target.name;
+              setStepMetadatas(onchangeStepDefault(propName, propValue));
+            }
+          }
+        },
+        {
           propName: 'extEndpointData',
           propLabel: 'Data',
           propValue: '{}',
@@ -344,12 +362,14 @@ export default function ActionCreation() {
       let generatorStrategy = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "generatorStrategy")?.propValue;
       let successCriteria = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "successCriteria")?.propValue;
       let responseConsumerType = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "responseConsumerType")?.propValue;
+      let executorServiceType = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "executorServiceType")?.propValue;
       let endpointMetadataDefinition: ExtEndpointMetadata = {
         input: {
           application,
           taskName,
           noAttemptTimes,
           noParallelThread,
+          executorServiceType,
           requestInfo: {
             extEndpoint,
             method,

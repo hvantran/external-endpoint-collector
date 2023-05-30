@@ -69,7 +69,7 @@ export default function PropertyRender(props: any) {
             }
             let selectionMeta = property.selectionMeta;
             renderNode = (
-                <FormControl sx={{ m: 1, width: '100%' }} size="small">
+                <FormControl sx={{ m: 1, width: '100%', margin: 0}} size="small">
                     <Select
                         labelId={"demo-select-small".concat(property.propName)}
                         id={"demo-select-small".concat(property.propName)}

@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { EXT_ENDPOINT_BACKEND_URL, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
+import TextTruncate from '../common/TextTruncate';
 
 
 
@@ -56,6 +57,27 @@ export default function ExtEndpointSummary() {
     { id: 'application', label: 'Application', minWidth: 100 },
     { id: 'taskName', label: 'Task', minWidth: 100 },
     {
+      id: 'elapsedTime',
+      label: 'Elapsed time',
+      minWidth: 100,
+      align: 'left',
+      format: (value: string) => value,
+    },
+    {
+      id: 'responseConsumerType',
+      label: 'Targeting',
+      minWidth: 100,
+      align: 'left',
+      format: (value: string) => value,
+    },
+    {
+      id: 'executorServiceType',
+      label: 'Executor',
+      minWidth: 100,
+      align: 'left',
+      format: (value: string) => value,
+    },
+    {
       id: 'noAttemptTimes',
       label: 'Attempt times',
       minWidth: 100,
@@ -74,21 +96,21 @@ export default function ExtEndpointSummary() {
       label: 'Target URL',
       minWidth: 170,
       align: 'left',
-      format: (value: number) => value,
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />)
     },
     {
       id: 'extEndpointMethod',
       label: 'Method',
       minWidth: 100,
       align: 'left',
-      format: (value: number) => value,
+      format: (value: string) => value,
     },
     {
       id: 'extEndpointData',
       label: 'Data',
       minWidth: 170,
       align: 'left',
-      format: (value: number) => value,
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />)
     },
     {
       id: 'successCriteria',
@@ -164,7 +186,10 @@ export default function ExtEndpointSummary() {
           extEndpoint: record.input.requestInfo.extEndpoint,
           extEndpointMethod: record.input.requestInfo.method,
           extEndpointData: record.input.requestInfo.data,
-          successCriteria: record.filter.successCriteria
+          successCriteria: record.filter.successCriteria,
+          elapsedTime: record.elapsedTime,
+          responseConsumerType: record.output.responseConsumerType,
+          executorServiceType: record.input.executorServiceType
         }
         return transfromRecord;
       }

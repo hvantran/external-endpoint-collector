@@ -41,6 +41,9 @@ export interface ExtEndpointOverview {
     extEndpointMethod: string
     extEndpointData: string
     successCriteria: string
+    elapsedTime: string
+    responseConsumerType: string
+    executorServiceType: string
 }
 
 export interface ExtEndpointResponseOverview {
@@ -94,5 +97,6 @@ export interface InputMetadata {
     noParallelThread: number
     requestInfo: RequestInfoMeta
     columnMetadata: string
+    executorServiceType: string
     dataGeneratorInfo: DataGeneratorInfoMeta
 }
