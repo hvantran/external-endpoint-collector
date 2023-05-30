@@ -53,6 +53,7 @@ public class ExtTaskEntry implements Callable<Void> {
             RequestParamsBuilder requestParamsBuilder = RequestParams.builder(url, httpClient)
                     .method(endpointMethod)
                     .headers(headers)
+                    .requestTimeoutInMs(1 * 60 * 1000)
                     .data(endpointMethod == HttpMethod.POST ? data.replace("{random}", random) : null);
             requestParamsBuilder.httpClient(httpClient);
             return HTTP_CLIENT_SERVICE.sendHTTPRequest()
