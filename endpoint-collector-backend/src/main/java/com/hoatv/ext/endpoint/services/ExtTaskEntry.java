@@ -11,6 +11,9 @@ import com.hoatv.fwk.common.services.HttpClientService.HttpMethod;
 import com.hoatv.fwk.common.services.HttpClientService.RequestParams;
 import com.hoatv.fwk.common.services.HttpClientService.RequestParams.RequestParamsBuilder;
 import com.hoatv.system.health.metrics.MethodStatisticCollector;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
 import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,12 +41,12 @@ public class ExtTaskEntry implements Callable<Void> {
 
     public static ExecutionTemplate<String> getExecutionTemplate(String extEndpoint, HttpMethod endpointMethod,
                                                            String data, String random, Map<String, String> headers) {
-        String url = endpointMethod == HttpMethod.GET ? String.format(extEndpoint, random) : extEndpoint;
+        String url = endpointMethod == HttpMethod.GET ? extEndpoint.replace("{random}", random) : extEndpoint;
         return httpClient -> {
             RequestParamsBuilder requestParamsBuilder = RequestParams.builder(url, httpClient)
                 .method(endpointMethod)
                 .headers(headers)
-                .data(endpointMethod == HttpMethod.POST ? String.format(data, random) : null);
+                .data(endpointMethod == HttpMethod.POST ? data.replace("{random}", random) : null);
             requestParamsBuilder.httpClient(httpClient);
             return HTTP_CLIENT_SERVICE.sendHTTPRequest()
                     .andThen(HttpClientService::asString)

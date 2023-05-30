@@ -46,7 +46,7 @@ public class SaltGeneratorUtils {
         return getSalt(length, salt, SALT_NUMS);
     }
 
-    public static String getSequenceNums(int length, int startWith, int increases) {
+    public static String getSequenceNums(int length, long startWith, int increases) {
         return StringUtils.leftPad(String.valueOf(startWith+increases), length, "0");
     }
 
@@ -69,7 +69,7 @@ public class SaltGeneratorUtils {
 
         switch (generatorType) {
             case SEQUENCE:
-                return getSequenceNums(generatorSaltLength, Integer.parseInt(generatorSaltStartWith), increases);
+                return getSequenceNums(generatorSaltLength, Long.parseLong(generatorSaltStartWith), increases);
             case RANDOM:
                 Method generatorMethod = generatorMethodFunc.apply(generatorMethodName);
                 return (String) generatorMethod.invoke(SaltGeneratorUtils.class, generatorSaltLength, generatorSaltStartWith);

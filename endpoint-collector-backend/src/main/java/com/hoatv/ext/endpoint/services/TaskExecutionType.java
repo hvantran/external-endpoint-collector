@@ -27,6 +27,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
     EXECUTE_WITH_EXECUTOR_SERVICE {
         @Override
         public Callable<Object> getExecutionTasks(ExecutionContext executionContext) {
+            LOGGER.info("Context: {}", executionContext);
             return () -> {
                 String application = executionContext.application;
                 EndpointSettingVO.Input input = executionContext.input;
@@ -71,6 +72,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
     EXECUTE_WITH_COMPLETABLE_FUTURE {
         @Override
         public Callable<Object> getExecutionTasks(ExecutionContext executionContext) {
+            LOGGER.info("Context: {}", executionContext);
             return () -> {
                 String application = executionContext.application;
                 EndpointSettingVO.Input input = executionContext.input;
@@ -87,10 +89,9 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
 
                 TaskMgmtServiceV1 httpClientThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(
                         noParallelThread, 5000, application);
-                TaskMgmtServiceV1 cpuBoundThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(4, 5000,
+                int numberOfProcess = Runtime.getRuntime().availableProcessors();
+                TaskMgmtServiceV1 cpuBoundThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(numberOfProcess, 5000,
                         "CPU-" + application);
-                TaskMgmtServiceV1 databaseThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(100, 5000,
-                        "IO-" + application);
                 GenericHttpClientPool httpClientPool = HttpClientFactory.INSTANCE.getGenericHttpClientPool(
                         input.getTaskName(), noParallelThread, 2000);
 
@@ -120,6 +121,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                             }, httpClientThreadPool).thenAccept(extTaskReportVO -> {
                                 String random = extTaskReportVO.getAttemptValue();
                                 String responseString = extTaskReportVO.getExecutionResult();
+
                                 if (StringUtils.isNotEmpty(responseString) && responseString.contains(successResponseFilter)) {
                                     responseConsumer.accept(random, responseString);
                                 } else {

@@ -1,3 +1,4 @@
+/*
 package com.hoatv.ext.endpoint.config;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .requestMatchers("/endpoints/**")
+                .requestMatchers("/ext-endpoint-collector/**")
                 .hasRole("basic")
                 .anyRequest()
                 .permitAll();
@@ -88,3 +89,4 @@ public class SecurityConfig {
         return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList());
     }
 }
+*/
