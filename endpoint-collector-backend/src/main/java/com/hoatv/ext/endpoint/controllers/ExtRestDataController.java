@@ -35,7 +35,7 @@ public class ExtRestDataController {
                                                 @RequestParam int pageIndex,
                                                 @RequestParam int pageSize) {
 
-        Sort defaultSorting = Sort.by(Sort.Order.asc("createdAt"), Sort.Order.asc("application"));
+        Sort defaultSorting = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.asc("application"));
         Page<EndpointSummaryVO> allExtEndpoints =
                 extRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(allExtEndpoints);
