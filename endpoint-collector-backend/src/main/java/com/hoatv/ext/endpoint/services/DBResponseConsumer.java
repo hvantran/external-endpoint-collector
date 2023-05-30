@@ -29,11 +29,13 @@ public class DBResponseConsumer implements ResponseConsumer {
 
     @Override
     public ResponseConsumerType getResponseConsumerType() {
+
         return ResponseConsumerType.DATABASE;
     }
 
     @Override
     public BiConsumer<String, String> onSuccessResponse(MetadataVO metadataVO, EndpointSetting endpointSetting) {
+
         return (random, responseString) -> {
             Object document = Configuration.defaultConfiguration().jsonProvider().parse(responseString);
 
@@ -68,6 +70,7 @@ public class DBResponseConsumer implements ResponseConsumer {
 
     @Override
     public BiConsumer<String, String> onErrorResponse() {
+
         return (random, responseString) -> {
         };
     }

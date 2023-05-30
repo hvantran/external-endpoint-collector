@@ -24,26 +24,36 @@ public class EndpointResponse {
 
     @Column
     private String column1;
+
     @Column(length = 1024)
     private String column2;
+
     @Column(length = 1024)
     private String column3;
+
     @Column
     private String column4;
+
     @Column
     private String column5;
+
     @Column
     private String column6;
+
     @Column
     private String column7;
+
     @Column
     private String column8;
+
     @Column(length = 1024)
     private String column9;
+
     @Column(length = 1024)
     private String column10;
 
     public EndpointResponseVO toEndpointResponseVO() {
+
         return EndpointResponseVO.builder()
                 .id(id)
                 .column1(column1)

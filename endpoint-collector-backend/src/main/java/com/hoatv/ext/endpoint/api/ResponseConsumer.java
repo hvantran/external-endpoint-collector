@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 public interface ResponseConsumer {
 
     default ResponseConsumerType getResponseConsumerType() {
+
         return ResponseConsumerType.CONSOLE;
     }
 

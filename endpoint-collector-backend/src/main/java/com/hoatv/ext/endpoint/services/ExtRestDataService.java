@@ -3,11 +3,14 @@ package com.hoatv.ext.endpoint.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hoatv.ext.endpoint.api.ResponseConsumer;
 import com.hoatv.ext.endpoint.api.ResponseConsumerType;
+import com.hoatv.ext.endpoint.dtos.DataGeneratorInfoVO;
 import com.hoatv.ext.endpoint.dtos.DataGeneratorVO;
 import com.hoatv.ext.endpoint.dtos.EndpointResponseVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
-import com.hoatv.ext.endpoint.dtos.EndpointSettingVO.Input;
+import com.hoatv.ext.endpoint.dtos.EndpointSummaryVO;
+import com.hoatv.ext.endpoint.dtos.InputVO;
 import com.hoatv.ext.endpoint.dtos.MetadataVO;
+import com.hoatv.ext.endpoint.dtos.OutputVO;
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
@@ -27,6 +30,7 @@ import com.hoatv.task.mgmt.entities.TaskEntry;
 import com.hoatv.task.mgmt.services.TaskFactory;
 import com.hoatv.task.mgmt.services.TaskMgmtService;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -53,12 +57,19 @@ public class ExtRestDataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtRestDataService.class);
 
     private final ExtEndpointSettingRepository extEndpointSettingRepository;
+
     private final ExtEndpointResponseRepository endpointResponseRepository;
+
     private final ExtExecutionResultRepository extExecutionResultRepository;
+
     private final MethodStatisticCollector methodStatisticCollector;
+
     private final ResponseConsumerFactory responseConsumerFactory;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final AtomicInteger numberOfSuccessResponse = new AtomicInteger(0);
+
     private final AtomicInteger numberOfErrorResponse = new AtomicInteger(0);
 
     public ExtRestDataService(ExtEndpointSettingRepository extEndpointSettingRepository,
@@ -66,6 +77,7 @@ public class ExtRestDataService {
                               ExtExecutionResultRepository extExecutionResultRepository,
                               MethodStatisticCollector methodStatisticCollector,
                               ResponseConsumerFactory responseConsumerFactory) {
+
         this.extEndpointSettingRepository = extEndpointSettingRepository;
         this.endpointResponseRepository = endpointResponseRepository;
         this.extExecutionResultRepository = extExecutionResultRepository;
@@ -75,15 +87,18 @@ public class ExtRestDataService {
 
     @Metric(name = "ext-number-of-success-responses")
     public SimpleValue getNumberOfSuccessResponse() {
+
         return new SimpleValue(numberOfSuccessResponse.get());
     }
 
     @Metric(name = "ext-number-of-failure-responses")
     public SimpleValue getNumberOfErrorResponse() {
+
         return new SimpleValue(numberOfErrorResponse.get());
     }
 
     public Long addExtEndpoint(EndpointSettingVO endpointSettingVO) {
+
         EndpointSetting endpointSetting = EndpointSetting.fromEndpointConfigVO(endpointSettingVO);
         HttpMethod extSupportedMethod = HttpMethod.fromString(endpointSetting.getMethod());
         ObjectUtils.checkThenThrow(Objects::isNull, extSupportedMethod, HttpMethod.INVALID_SUPPORTED_METHOD);
@@ -107,11 +122,10 @@ public class ExtRestDataService {
         CheckedSupplier<MetadataVO> columnMetadataVOSup = () -> objectMapper.readValue(columnMetadata, MetadataVO.class);
         MetadataVO metadataVO = columnMetadataVOSup.get();
 
-
         // Job configuration
         String application = endpointSetting.getApplication();
         String taskName = endpointSetting.getTaskName();
-        Input input = endpointSettingVO.getInput();
+        InputVO input = endpointSettingVO.getInput();
         int noAttemptTimes = input.getNoAttemptTimes();
         int noParallelThread = endpointSetting.getNoParallelThread();
 
@@ -119,7 +133,7 @@ public class ExtRestDataService {
         String generatorMethodName = endpointSetting.getGeneratorMethodName();
         Integer generatorSaltLength = endpointSetting.getGeneratorSaltLength();
         String generatorSaltStartWith = Optional.ofNullable(endpointSetting.getGeneratorSaltStartWith()).orElse("");
-        EndpointSettingVO.DataGeneratorInfoVO dataGeneratorInfo = input.getDataGeneratorInfo();
+        DataGeneratorInfoVO dataGeneratorInfo = input.getDataGeneratorInfo();
         GeneratorType generatorType = GeneratorType.valueOf(dataGeneratorInfo.getGeneratorStrategy());
 
         CheckedFunction<String, Method> generatorMethodFunc = getGeneratorMethodFunc(generatorSaltStartWith);
@@ -138,7 +152,7 @@ public class ExtRestDataService {
         executionResult.setNumberOfTasks(noAttemptTimes);
         extExecutionResultRepository.save(executionResult);
 
-        EndpointSettingVO.Output output = endpointSettingVO.getOutput();
+        OutputVO output = endpointSettingVO.getOutput();
         String responseConsumerTypeName = output.getResponseConsumerType().toUpperCase();
         ResponseConsumerType responseConsumerType = ResponseConsumerType.valueOf(responseConsumerTypeName);
         ResponseConsumer responseConsumer = responseConsumerFactory.getResponseConsumer(responseConsumerType);
@@ -163,11 +177,14 @@ public class ExtRestDataService {
                 .errorResponseConsumer(errorResponseBiConsumer)
                 .extExecutionResultRepository(extExecutionResultRepository)
                 .build();
-        return TaskExecutionType.EXECUTE_WITH_COMPLETABLE_FUTURE.getExecutionTasks(executionContext);
+        String executorServiceType = input.getExecutorServiceType();
+        LOGGER.info("Running endpoint collector: {} with executor : {}", taskName, executorServiceType);
+        return TaskExecutionType.valueOf(executorServiceType).getExecutionTasks(executionContext);
     }
 
     @TimingMetricMonitor
     public Page<EndpointResponseVO> getEndpointResponses(Long endpointId, Pageable pageable) {
+
         Optional<EndpointSetting> endpointSettingsOp = extEndpointSettingRepository.findById(endpointId);
         EndpointSetting endpointSetting = endpointSettingsOp
                 .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)));
@@ -179,6 +196,7 @@ public class ExtRestDataService {
 
     @TimingMetricMonitor
     public Page<EndpointResponseVO> getEndpointResponses(String application, Pageable pageable) {
+
         Page<EndpointSetting> endpointSettings = extEndpointSettingRepository.findEndpointConfigsByApplication(
                 application, PageRequest.of(0, 10));
         if (endpointSettings.isEmpty()) {
@@ -190,17 +208,25 @@ public class ExtRestDataService {
     }
 
     @TimingMetricMonitor
-    public Page<EndpointSettingVO> getAllExtEndpoints(String application, Pageable pageable) {
+    public Page<EndpointSummaryVO> getAllExtEndpoints(String application, Pageable pageable) {
+
         if (Objects.isNull(application)) {
-            return extEndpointSettingRepository.findAll(pageable).map(EndpointSetting::toEndpointConfigVO);
+            Page<EndpointSetting> endpointSettings = extEndpointSettingRepository.findAll(pageable);
+            return endpointSettings.map(p -> {
+                EndpointExecutionResult byEndpointSetting = extExecutionResultRepository.findByEndpointSetting(p);
+                return p.toEndpointSummaryVO().elapsedTime(byEndpointSetting.getElapsedTime()).build();
+            });
         }
-        Page<EndpointSetting> endpointConfigsByApplication =
-                extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
-        return endpointConfigsByApplication.map(EndpointSetting::toEndpointConfigVO);
+        Page<EndpointSetting> endpointConfigsByApplication = extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
+        return endpointConfigsByApplication.map(p -> {
+            EndpointExecutionResult byEndpointSetting = extExecutionResultRepository.findByEndpointSetting(p);
+            return p.toEndpointSummaryVO().elapsedTime(byEndpointSetting.getElapsedTime()).build();
+        });
     }
 
     @TimingMetricMonitor
     public boolean deleteEndpoint(Long endpointId) {
+
         Optional<EndpointSetting> endpointSettingsOp = extEndpointSettingRepository.findById(endpointId);
         EndpointSetting endpointSetting = endpointSettingsOp
                 .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)));

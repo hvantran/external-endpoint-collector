@@ -13,12 +13,14 @@ import org.springframework.web.client.RestTemplate;
 public class ExtEndpointApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(ExtEndpointApplication.class);
     }
 
 
     @Bean
     public RestTemplate restTemplate() {
+
         return new RestTemplate();
     }
 

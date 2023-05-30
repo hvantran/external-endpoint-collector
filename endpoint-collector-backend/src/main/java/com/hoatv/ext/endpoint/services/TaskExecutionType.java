@@ -4,6 +4,7 @@ import com.hoatv.ext.endpoint.api.TaskExecutionImplementation;
 import com.hoatv.ext.endpoint.dtos.DataGeneratorVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
 import com.hoatv.ext.endpoint.dtos.ExtTaskReportVO;
+import com.hoatv.ext.endpoint.dtos.InputVO;
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.repositories.ExtExecutionResultRepository;
 import com.hoatv.ext.endpoint.utils.SaltGeneratorUtils;
@@ -27,10 +28,11 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
     EXECUTE_WITH_EXECUTOR_SERVICE {
         @Override
         public Callable<Object> getExecutionTasks(ExecutionContext executionContext) {
+
             LOGGER.info("Context: {}", executionContext);
             return () -> {
                 String application = executionContext.application;
-                EndpointSettingVO.Input input = executionContext.input;
+                InputVO input = executionContext.input;
                 int noParallelThread = executionContext.noParallelThread;
                 int noAttemptTimes = executionContext.noAttemptTimes;
                 EndpointSettingVO endpointSettingVO = executionContext.endpointSettingVO;
@@ -72,10 +74,11 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
     EXECUTE_WITH_COMPLETABLE_FUTURE {
         @Override
         public Callable<Object> getExecutionTasks(ExecutionContext executionContext) {
+
             LOGGER.info("Context: {}", executionContext);
             return () -> {
                 String application = executionContext.application;
-                EndpointSettingVO.Input input = executionContext.input;
+                InputVO input = executionContext.input;
                 int noParallelThread = executionContext.noParallelThread;
                 int noAttemptTimes = executionContext.noAttemptTimes;
                 EndpointSettingVO endpointSettingVO = executionContext.endpointSettingVO;
@@ -143,6 +146,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutionType.class);
 
     void savePercentComplete(ExtExecutionResultRepository extExecutionResultRepository, int noAttemptTimes, EndpointExecutionResult executionResult, int index) {
+
         int percentComplete = executionResult.getPercentComplete();
         int nextPercentComplete = index * 100 / noAttemptTimes;
 

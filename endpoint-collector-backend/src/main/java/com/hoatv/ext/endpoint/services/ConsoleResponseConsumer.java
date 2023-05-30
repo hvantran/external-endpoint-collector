@@ -15,16 +15,21 @@ public class ConsoleResponseConsumer implements ResponseConsumer {
 
     @Override
     public ResponseConsumerType getResponseConsumerType() {
+
         return ResponseConsumerType.CONSOLE;
     }
 
     @Override
     public BiConsumer<String, String> onSuccessResponse(MetadataVO metadataVO, EndpointSetting endpointSetting) {
+
         return (randomValue, responseString) -> LOGGER.info("{} - {}", randomValue, responseString);
     }
 
     @Override
     public BiConsumer<String, String> onErrorResponse() {
-        return (randomValue, responseString) -> {LOGGER.warn("Error response: {} - {}", randomValue, responseString);};
+
+        return (randomValue, responseString) -> {
+            LOGGER.warn("Error response: {} - {}", randomValue, responseString);
+        };
     }
 }

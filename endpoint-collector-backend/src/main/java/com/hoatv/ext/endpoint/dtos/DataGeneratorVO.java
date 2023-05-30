@@ -13,10 +13,14 @@ import java.util.function.Predicate;
 public class DataGeneratorVO {
 
     private final String generatorMethodName;
+
     private final Integer generatorSaltLength;
+
     private final String generatorSaltStartWith;
 
     private final SaltGeneratorUtils.GeneratorType generatorType;
+
     private final CheckedFunction<String, Method> generatorMethodFunc;
+
     private final Predicate<String> checkExistingFunc;
 }

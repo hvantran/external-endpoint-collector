@@ -13,22 +13,27 @@ import java.util.Map;
 public class ResponseConsumerFactory {
 
     private final Map<ResponseConsumerType, ResponseConsumer> consumerRegistry = new EnumMap<ResponseConsumerType, ResponseConsumer>(ResponseConsumerType.class);
+
     private final ExtEndpointResponseRepository endpointResponseRepository;
 
     public ResponseConsumerFactory(ExtEndpointResponseRepository endpointResponseRepository) {
+
         this.endpointResponseRepository = endpointResponseRepository;
     }
 
     public void registerResponseConsumer(ResponseConsumer responseConsumer) {
+
         consumerRegistry.put(responseConsumer.getResponseConsumerType(), responseConsumer);
     }
 
     public ResponseConsumer getResponseConsumer(ResponseConsumerType responseConsumerType) {
+
         return consumerRegistry.get(responseConsumerType);
     }
 
     @PostConstruct
     public void init() {
+
         registerResponseConsumer(new ConsoleResponseConsumer());
         registerResponseConsumer(DBResponseConsumer.builder()
                 .endpointResponseRepository(endpointResponseRepository).build());

@@ -1,6 +1,6 @@
 package com.hoatv.ext.endpoint.dtos;
 
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,18 +14,19 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EndpointSettingVO {
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
+public class EndpointSummaryVO {
 
     private Long endpointId;
 
-    @Valid
     private InputVO input;
 
-    @Valid
     private FilterVO filter;
 
-    @Valid
     private OutputVO output;
 
+    private String elapsedTime;
+
+    private String createdAt;
 }
 

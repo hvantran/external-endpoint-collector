@@ -13,10 +13,13 @@ import java.util.function.Predicate;
 
 public class SaltGeneratorUtils {
     private static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+
     private static final String SALT_NUMS = "1234567890";
+
     private static final Random rnd = new Random();
 
     private SaltGeneratorUtils() {
+
     }
 
     public enum GeneratorType {
@@ -27,30 +30,36 @@ public class SaltGeneratorUtils {
     }
 
     public static String getSaltString(Integer length) {
+
         StringBuilder salt = new StringBuilder();
         return getSalt(length, salt, SALT_CHARS);
     }
 
     public static String getSaltString(Integer length, String startWith) {
+
         StringBuilder salt = new StringBuilder(startWith);
         return getSalt(length, salt, SALT_CHARS);
     }
 
     public static String getSaltNums(Integer length) {
+
         StringBuilder salt = new StringBuilder();
         return getSalt(length, salt, SALT_NUMS);
     }
 
     public static String getSaltNums(Integer length, String startWith) {
+
         StringBuilder salt = new StringBuilder(startWith);
         return getSalt(length, salt, SALT_NUMS);
     }
 
     public static String getSequenceNums(int length, long startWith, int increases) {
-        return StringUtils.leftPad(String.valueOf(startWith+increases), length, "0");
+
+        return StringUtils.leftPad(String.valueOf(startWith + increases), length, "0");
     }
 
     private static String getSalt(int length, StringBuilder salt, String saltNums) {
+
         while (salt.length() < length) {
             int index = rnd.nextInt(saltNums.length());
             salt.append(saltNums.charAt(index));
@@ -87,7 +96,9 @@ public class SaltGeneratorUtils {
                 return null;
         }
     }
+
     public static CheckedFunction<String, Method> getGeneratorMethodFunc(String generatorSaltStartWith) {
+
         return methodName -> {
             if (StringUtils.isNotEmpty(generatorSaltStartWith)) {
                 return SaltGeneratorUtils.class.getMethod(methodName, Integer.class, String.class);

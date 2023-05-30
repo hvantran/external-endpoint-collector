@@ -46,6 +46,7 @@ public class EndpointExecutionResult {
 
     @PrePersist
     public void prePersist() {
+
         startedAt = LocalDateTime.now();
         percentComplete = 0;
         numberOfCompletedTasks = 0;
@@ -53,6 +54,7 @@ public class EndpointExecutionResult {
 
     @PreUpdate
     public void preUpdate() {
+
         if (percentComplete == 100) {
             endedAt = LocalDateTime.now();
             long elapsedTimeMillis = ChronoUnit.MILLIS.between(startedAt, endedAt);

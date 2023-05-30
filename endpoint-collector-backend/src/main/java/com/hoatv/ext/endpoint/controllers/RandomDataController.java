@@ -13,11 +13,13 @@ public class RandomDataController {
 
     @GetMapping(value = "/numbers")
     public String getAllExtEndpoints(@RequestParam Integer length) {
+
         return SaltGeneratorUtils.getSaltNums(length);
     }
 
     @GetMapping(value = "/chars")
     public String getEndpointResponses(@RequestParam Integer length) {
+
         return SaltGeneratorUtils.getSaltString(length);
     }
 }

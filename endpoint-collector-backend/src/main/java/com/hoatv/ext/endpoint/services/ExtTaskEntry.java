@@ -1,7 +1,8 @@
 package com.hoatv.ext.endpoint.services;
 
 import com.hoatv.ext.endpoint.dtos.DataGeneratorVO;
-import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
+import com.hoatv.ext.endpoint.dtos.FilterVO;
+import com.hoatv.ext.endpoint.dtos.InputVO;
 import com.hoatv.ext.endpoint.utils.SaltGeneratorUtils;
 import com.hoatv.fwk.common.services.CheckedSupplier;
 import com.hoatv.fwk.common.services.GenericHttpClientPool;
@@ -11,9 +12,6 @@ import com.hoatv.fwk.common.services.HttpClientService.HttpMethod;
 import com.hoatv.fwk.common.services.HttpClientService.RequestParams;
 import com.hoatv.fwk.common.services.HttpClientService.RequestParams.RequestParamsBuilder;
 import com.hoatv.system.health.metrics.MethodStatisticCollector;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
 import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,26 +25,35 @@ import java.util.function.BiConsumer;
 public class ExtTaskEntry implements Callable<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtTaskEntry.class);
+
     private static final HttpClientService HTTP_CLIENT_SERVICE = HttpClientService.INSTANCE;
 
     private final int index;
-    private final EndpointSettingVO.Input input;
-    private final EndpointSettingVO.Filter filter;
+
+    private final InputVO input;
+
+    private final FilterVO filter;
+
     private final GenericHttpClientPool httpClientPool;
+
     private final DataGeneratorVO dataGeneratorVO;
+
     private final BiConsumer<String, String> onSuccessResponse;
+
     private final BiConsumer<String, String> onErrorResponse;
+
     private final MethodStatisticCollector methodStatisticCollector;
 
 
     public static ExecutionTemplate<String> getExecutionTemplate(String extEndpoint, HttpMethod endpointMethod,
-                                                           String data, String random, Map<String, String> headers) {
+                                                                 String data, String random, Map<String, String> headers) {
+
         String url = endpointMethod == HttpMethod.GET ? extEndpoint.replace("{random}", random) : extEndpoint;
         return httpClient -> {
             RequestParamsBuilder requestParamsBuilder = RequestParams.builder(url, httpClient)
-                .method(endpointMethod)
-                .headers(headers)
-                .data(endpointMethod == HttpMethod.POST ? data.replace("{random}", random) : null);
+                    .method(endpointMethod)
+                    .headers(headers)
+                    .data(endpointMethod == HttpMethod.POST ? data.replace("{random}", random) : null);
             requestParamsBuilder.httpClient(httpClient);
             return HTTP_CLIENT_SERVICE.sendHTTPRequest()
                     .andThen(HttpClientService::asString)
@@ -55,6 +62,7 @@ public class ExtTaskEntry implements Callable<Void> {
     }
 
     public Void call() {
+
         long startTime = System.currentTimeMillis();
         CheckedSupplier<String> supplier = () -> SaltGeneratorUtils.generateSaltValue(dataGeneratorVO, index);
         String random = supplier.get();
