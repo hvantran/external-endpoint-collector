@@ -57,6 +57,13 @@ export default function ExtEndpointSummary() {
     { id: 'application', label: 'Application', minWidth: 100 },
     { id: 'taskName', label: 'Task', minWidth: 100 },
     {
+      id: 'createdAt',
+      label: 'Created at',
+      minWidth: 100,
+      align: 'left',
+      format: (value: string) => value,
+    },
+    {
       id: 'elapsedTime',
       label: 'Elapsed time',
       minWidth: 100,
@@ -114,7 +121,7 @@ export default function ExtEndpointSummary() {
     },
     {
       id: 'successCriteria',
-      label: 'Success Criteria',
+      label: 'Success criteria',
       minWidth: 150,
       align: 'left',
       format: (value: string) => value,
@@ -188,6 +195,7 @@ export default function ExtEndpointSummary() {
           extEndpointData: record.input.requestInfo.data,
           successCriteria: record.filter.successCriteria,
           elapsedTime: record.elapsedTime,
+          createdAt: record.createdAt,
           responseConsumerType: record.output.responseConsumerType,
           executorServiceType: record.input.executorServiceType
         }

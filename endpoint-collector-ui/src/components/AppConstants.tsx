@@ -44,6 +44,7 @@ export interface ExtEndpointOverview {
     elapsedTime: string
     responseConsumerType: string
     executorServiceType: string
+    createdAt: string
 }
 
 export interface ExtEndpointResponseOverview {
