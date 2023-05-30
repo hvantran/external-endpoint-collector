@@ -85,8 +85,15 @@ export default function ExtEndpointSummary() {
       format: (value: string) => value,
     },
     {
+      id: 'fromPosition',
+      label: 'From',
+      minWidth: 170,
+      align: 'left',
+      format: (value: number) => value.toLocaleString('en-US'),
+    },
+    {
       id: 'noAttemptTimes',
-      label: 'Attempt times',
+      label: 'Sample times',
       minWidth: 100,
       align: 'left',
       format: (value: number) => value.toLocaleString('en-US'),
@@ -196,6 +203,7 @@ export default function ExtEndpointSummary() {
           successCriteria: record.filter.successCriteria,
           elapsedTime: record.elapsedTime,
           createdAt: record.createdAt,
+          fromPosition: record.input.dataGeneratorInfo.generatorSaltStartWith,
           responseConsumerType: record.output.responseConsumerType,
           executorServiceType: record.input.executorServiceType
         }

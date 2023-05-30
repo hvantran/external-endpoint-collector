@@ -45,6 +45,7 @@ export interface ExtEndpointOverview {
     responseConsumerType: string
     executorServiceType: string
     createdAt: string
+    fromPosition: string
 }
 
 export interface ExtEndpointResponseOverview {
