@@ -144,7 +144,12 @@ export default function ActionCreation() {
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: ["GET", "POST", "PUT", "DELETE"],
+            selections: [
+              {label: "GET", value: 'GET'}, 
+              {label: "POST", value: 'POST'}, 
+              {label: "PUT", value: 'PUT'}, 
+              {label: "DELETE", value:'DELETE'}
+            ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
               let propName = event.target.name;
@@ -198,7 +203,13 @@ export default function ActionCreation() {
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: ["RANDOM", "SEQUENCE", "RANDOM_WITH_CONDITION", "NONE"],
+            selections: [
+              {label: "GET", value: 'GET'}, 
+              {label: "RANDOM", value: 'RANDOM'}, 
+              {label: "SEQUENCE", value: 'SEQUENCE'}, 
+              {label: "RANDOM_WITH_CONDITION", value: 'RANDOM_WITH_CONDITION'}, 
+              {label: "NONE", value: 'NONE'}
+            ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
               let propName = event.target.name;
@@ -234,7 +245,10 @@ export default function ActionCreation() {
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: ["CONSOLE", "DATABASE"],
+            selections: [              
+              {label: "CONSOLE", value: 'CONSOLE'}, 
+              {label: "DATABASE", value: 'DATABASE'}
+            ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
               let propName = event.target.name;
@@ -256,7 +270,10 @@ export default function ActionCreation() {
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: ["EXECUTE_WITH_COMPLETABLE_FUTURE", "EXECUTE_WITH_EXECUTOR_SERVICE"],
+            selections: [
+              {label: "EXECUTE_WITH_COMPLETABLE_FUTURE", value: 'EXECUTE_WITH_COMPLETABLE_FUTURE'}, 
+              {label: "EXECUTE_WITH_EXECUTOR_SERVICE", value: 'EXECUTE_WITH_EXECUTOR_SERVICE'}
+            ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
               let propName = event.target.name;
