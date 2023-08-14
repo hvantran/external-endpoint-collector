@@ -44,7 +44,7 @@ export default function ActionCreation() {
           propValue: '',
           isRequired: true,
           layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 2 },
+          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           propDescription: 'The application name',
           propType: PropType.InputText,
@@ -67,7 +67,7 @@ export default function ActionCreation() {
           propValue: '',
           isRequired: true,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4 },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -86,7 +86,7 @@ export default function ActionCreation() {
           isRequired: true,
           propExtraProperties: {type: "number"},
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 5 } },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -105,7 +105,7 @@ export default function ActionCreation() {
           isRequired: true,
           propExtraProperties: {type: "number"},
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4 },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -122,7 +122,7 @@ export default function ActionCreation() {
           propValue: '',
           isRequired: true,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 5 } },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -140,7 +140,7 @@ export default function ActionCreation() {
           propDefaultValue: 'GET',
           isRequired: true,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4 },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
@@ -166,7 +166,7 @@ export default function ActionCreation() {
           propLabel: 'Generator data length',
           propValue: '',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 5 } },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -182,7 +182,7 @@ export default function ActionCreation() {
           propLabel: 'Generator start with',
           propValue: '',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4 },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -199,7 +199,7 @@ export default function ActionCreation() {
           propValue: 'NONE',
           propDefaultValue: 'NONE',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 5 } },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
@@ -224,7 +224,7 @@ export default function ActionCreation() {
           isRequired: true,
           propExtraProperties: {placeholder: 'Contain a text in success case'},
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4 },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -241,7 +241,7 @@ export default function ActionCreation() {
           propValue: 'CONSOLE',
           propDefaultValue: 'CONSOLE',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 5 } },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
@@ -266,7 +266,7 @@ export default function ActionCreation() {
           propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
           propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4 },
+          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
@@ -288,7 +288,7 @@ export default function ActionCreation() {
           propDefaultValue: '{}',
           disabled: true,
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2 },
+          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
@@ -310,7 +310,7 @@ export default function ActionCreation() {
           propDefaultValue: '{}',
           disabled: true,
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2 },
+          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
