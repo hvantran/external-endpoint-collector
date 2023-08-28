@@ -265,6 +265,7 @@ export interface TableMetadata {
     columns: Array<ColumnMetadata>
     pagingOptions: PagingOptionMetadata
     pagingResult: PagingResult
+    onRowClickCallback?: (record: any) => any
 }
 
 
@@ -288,8 +289,8 @@ export interface StepMetadata extends EntityMetadata {
 
 export interface DialogMetadata {
     open: boolean
-    title: string,
-    content: string,
+    title?: string,
+    content?: string,
     negativeText: string
     positiveText: string
     negativeAction?: () => void
