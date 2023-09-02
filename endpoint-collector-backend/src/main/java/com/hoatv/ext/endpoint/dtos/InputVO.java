@@ -1,7 +1,6 @@
 package com.hoatv.ext.endpoint.dtos;
 
 
-import com.hoatv.ext.endpoint.api.ResponseConsumerType;
 import com.hoatv.ext.endpoint.services.TaskExecutionType;
 import com.hoatv.springboot.common.validation.ValueOfEnum;
 import jakarta.validation.Valid;

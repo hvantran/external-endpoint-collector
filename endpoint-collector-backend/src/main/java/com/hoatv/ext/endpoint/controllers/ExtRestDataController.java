@@ -24,14 +24,14 @@ public class ExtRestDataController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addExtEndpoint(@Valid @RequestBody EndpointSettingVO endpointSettingVO) {
+    public ResponseEntity addExtEndpoint(@Valid @RequestBody EndpointSettingVO endpointSettingVO) {
 
         Long extEndpoint = extRestDataService.addExtEndpoint(endpointSettingVO);
         return ResponseEntity.ok(String.format("{\"endpointId\": %s}", extEndpoint));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllExtEndpoints(@RequestParam(required = false) String application,
+    public ResponseEntity getAllExtEndpoints(@RequestParam(required = false) String application,
                                                 @RequestParam int pageIndex,
                                                 @RequestParam int pageSize) {
 
@@ -42,14 +42,14 @@ public class ExtRestDataController {
     }
 
     @DeleteMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getEndpointResponses(@PathVariable("endpointId") Long endpointId) {
+    public ResponseEntity getEndpointResponses(@PathVariable("endpointId") Long endpointId) {
 
         boolean isDeleted = extRestDataService.deleteEndpoint(endpointId);
         return ResponseEntity.ok(String.format("{\"message\": %s}", isDeleted));
     }
 
     @GetMapping(value = "/{endpointId}/responses", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getEndpointResponses(@PathVariable("endpointId") Long endpointId,
+    public ResponseEntity getEndpointResponses(@PathVariable("endpointId") Long endpointId,
                                                   @RequestParam int pageIndex,
                                                   @RequestParam int pageSize) {
 
@@ -60,7 +60,7 @@ public class ExtRestDataController {
     }
 
     @GetMapping(value = "/{application}/responses-by-app-name", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getEndpointResponses(@PathVariable("application") String application,
+    public ResponseEntity getEndpointResponses(@PathVariable("application") String application,
                                                   @RequestParam int pageIndex,
                                                   @RequestParam int pageSize) {
 

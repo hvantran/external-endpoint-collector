@@ -5,11 +5,12 @@ import com.hoatv.fwk.common.services.HttpClientService;
 import com.hoatv.springboot.common.validation.ValueOfEnum;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @Getter
 @Builder

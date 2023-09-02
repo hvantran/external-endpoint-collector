@@ -1,33 +1,14 @@
 package com.hoatv.ext.endpoint.models;
 
-import com.hoatv.ext.endpoint.dtos.DataGeneratorInfoVO;
-import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
-import com.hoatv.ext.endpoint.dtos.EndpointSummaryVO;
-import com.hoatv.ext.endpoint.dtos.FilterVO;
-import com.hoatv.ext.endpoint.dtos.InputVO;
-import com.hoatv.ext.endpoint.dtos.OutputVO;
-import com.hoatv.ext.endpoint.dtos.RequestInfoVO;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
+import com.hoatv.ext.endpoint.dtos.*;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter

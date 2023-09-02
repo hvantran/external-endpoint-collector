@@ -3,8 +3,6 @@ package com.hoatv.ext.endpoint.repositories;
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
 import jakarta.transaction.Transactional;
-import java.util.Collection;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
