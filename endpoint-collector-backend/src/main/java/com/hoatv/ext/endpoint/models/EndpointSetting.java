@@ -121,38 +121,33 @@ public class EndpointSetting {
 
     public EndpointSummaryVO.EndpointSummaryVOBuilder toEndpointSummaryVO() {
 
-        RequestInfoVO requestInfo = RequestInfoVO.builder()
-                .data(data)
-                .extEndpoint(extEndpoint)
-                .method(method)
-                .build();
-        DataGeneratorInfoVO dataGeneratorInfo = DataGeneratorInfoVO.builder()
-                .generatorMethodName(generatorMethodName)
-                .generatorSaltLength(generatorSaltLength)
-                .generatorSaltStartWith(generatorSaltStartWith)
-                .build();
-        InputVO input = InputVO.builder()
-                .application(application)
-                .taskName(taskName)
-                .noAttemptTimes(noAttemptTimes)
-                .noParallelThread(noParallelThread)
-                .columnMetadata(columnMetadata)
-                .dataGeneratorInfo(dataGeneratorInfo)
-                .requestInfo(requestInfo)
-                .executorServiceType(executorServiceType)
-                .build();
-        FilterVO filter = FilterVO.builder()
-                .successCriteria(successCriteria)
-                .build();
-        OutputVO outputVO = OutputVO.builder()
-                .responseConsumerType(responseConsumerType)
-                .build();
         return EndpointSummaryVO.builder()
                 .endpointId(id)
-                .input(input)
-                .output(outputVO)
+                .input(InputVO.builder()
+                        .application(application)
+                        .taskName(taskName)
+                        .noAttemptTimes(noAttemptTimes)
+                        .noParallelThread(noParallelThread)
+                        .columnMetadata(columnMetadata)
+                        .dataGeneratorInfo(DataGeneratorInfoVO.builder()
+                                .generatorMethodName(generatorMethodName)
+                                .generatorSaltLength(generatorSaltLength)
+                                .generatorSaltStartWith(generatorSaltStartWith)
+                                .build())
+                        .requestInfo(RequestInfoVO.builder()
+                                .data(data)
+                                .extEndpoint(extEndpoint)
+                                .method(method)
+                                .build())
+                        .executorServiceType(executorServiceType)
+                        .build())
+                .output( OutputVO.builder()
+                        .responseConsumerType(responseConsumerType)
+                        .build())
                 .createdAt(Objects.isNull(createdAt) ? "" : createdAt.format(DateTimeFormatter.ISO_DATE_TIME))
-                .filter(filter);
+                .filter(FilterVO.builder()
+                        .successCriteria(successCriteria)
+                        .build());
     }
 
     public static EndpointSetting fromEndpointConfigVO(EndpointSettingVO endpointSettingVO) {

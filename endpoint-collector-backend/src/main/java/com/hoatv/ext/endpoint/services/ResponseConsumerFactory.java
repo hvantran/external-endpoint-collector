@@ -12,7 +12,7 @@ import java.util.Map;
 @Service
 public class ResponseConsumerFactory {
 
-    private final Map<ResponseConsumerType, ResponseConsumer> consumerRegistry = new EnumMap<ResponseConsumerType, ResponseConsumer>(ResponseConsumerType.class);
+    private final Map<ResponseConsumerType, ResponseConsumer> consumerRegistry = new EnumMap<>(ResponseConsumerType.class);
 
     private final ExtEndpointResponseRepository endpointResponseRepository;
 

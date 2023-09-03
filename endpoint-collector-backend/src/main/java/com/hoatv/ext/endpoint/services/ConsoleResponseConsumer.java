@@ -28,8 +28,6 @@ public class ConsoleResponseConsumer implements ResponseConsumer {
     @Override
     public BiConsumer<String, String> onErrorResponse() {
 
-        return (randomValue, responseString) -> {
-            LOGGER.warn("Error response: {} - {}", randomValue, responseString);
-        };
+        return (randomValue, responseString) ->  LOGGER.warn("Error response: {} - {}", randomValue, responseString);
     }
 }
