@@ -12,7 +12,6 @@ import {
   PagingOptionMetadata,
   PagingResult,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   TableMetadata
 } from '../GenericConstants';
@@ -20,7 +19,7 @@ import ProcessTracking from '../common/ProcessTracking';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { EXT_ENDPOINT_BACKEND_URL, ExtEndpointResponseOverview, ROOT_BREADCRUMB } from '../AppConstants';
-import SnackbarAlert from '../common/SnackbarAlert';
+
 import PageEntityRender from '../renders/PageEntityRender';
 
 
@@ -31,12 +30,9 @@ export default function ExtEndpointDetails() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
   const [pageIndex, setPageIndex] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(10);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+  const restClient = new RestClient(setCircleProcessOpen);
 
   const application: string | undefined = targetAction.application;
   if (!application) {
@@ -178,24 +174,15 @@ export default function ExtEndpointDetails() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: ()  => loadExternalEndpointResponseAsync(pageIndex, pageSize)
+        onClick: () => loadExternalEndpointResponseAsync(pageIndex, pageSize)
       }
     ]
-  }
-
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
   }
 
   return (
     <Stack spacing={2}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

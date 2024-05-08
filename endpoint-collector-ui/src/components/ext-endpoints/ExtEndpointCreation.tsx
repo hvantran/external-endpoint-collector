@@ -10,13 +10,12 @@ import {
   PropType,
   PropertyMetadata,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   StepMetadata,
   onchangeStepDefault
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
-import SnackbarAlert from '../common/SnackbarAlert';
+
 import PageEntityRender from '../renders/PageEntityRender';
 import TimelapseIcon from '@mui/icons-material/Timelapse';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
@@ -25,12 +24,9 @@ import ClearAllIcon from '@mui/icons-material/ClearAll';
 export default function ActionCreation() {
 
   let initialStepsV3: Array<StepMetadata> = []
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+  const restClient = new RestClient(setCircleProcessOpen);
 
   let initialStepMetadatas: Array<StepMetadata> = [
     {
@@ -44,7 +40,7 @@ export default function ActionCreation() {
           propValue: '',
           isRequired: true,
           layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           propDescription: 'The application name',
           propType: PropType.InputText,
@@ -67,7 +63,7 @@ export default function ActionCreation() {
           propValue: '',
           isRequired: true,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -84,9 +80,9 @@ export default function ActionCreation() {
           propValue: 1,
           propDefaultValue: 1,
           isRequired: true,
-          propExtraProperties: {type: "number"},
+          propExtraProperties: { type: "number" },
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -103,9 +99,9 @@ export default function ActionCreation() {
           propValue: 1,
           propDefaultValue: 1,
           isRequired: true,
-          propExtraProperties: {type: "number"},
+          propExtraProperties: { type: "number" },
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -122,7 +118,7 @@ export default function ActionCreation() {
           propValue: '',
           isRequired: true,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -140,15 +136,15 @@ export default function ActionCreation() {
           propDefaultValue: 'GET',
           isRequired: true,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
             selections: [
-              {label: "GET", value: 'GET'}, 
-              {label: "POST", value: 'POST'}, 
-              {label: "PUT", value: 'PUT'}, 
-              {label: "DELETE", value:'DELETE'}
+              { label: "GET", value: 'GET' },
+              { label: "POST", value: 'POST' },
+              { label: "PUT", value: 'PUT' },
+              { label: "DELETE", value: 'DELETE' }
             ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
@@ -166,7 +162,7 @@ export default function ActionCreation() {
           propLabel: 'Generator data length',
           propValue: '',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -182,7 +178,7 @@ export default function ActionCreation() {
           propLabel: 'Generator start with',
           propValue: '',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -199,16 +195,16 @@ export default function ActionCreation() {
           propValue: 'NONE',
           propDefaultValue: 'NONE',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
             selections: [
-              {label: "GET", value: 'GET'}, 
-              {label: "RANDOM", value: 'RANDOM'}, 
-              {label: "SEQUENCE", value: 'SEQUENCE'}, 
-              {label: "RANDOM_WITH_CONDITION", value: 'RANDOM_WITH_CONDITION'}, 
-              {label: "NONE", value: 'NONE'}
+              { label: "GET", value: 'GET' },
+              { label: "RANDOM", value: 'RANDOM' },
+              { label: "SEQUENCE", value: 'SEQUENCE' },
+              { label: "RANDOM_WITH_CONDITION", value: 'RANDOM_WITH_CONDITION' },
+              { label: "NONE", value: 'NONE' }
             ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
@@ -222,9 +218,9 @@ export default function ActionCreation() {
           propLabel: 'Success condition',
           propValue: '',
           isRequired: true,
-          propExtraProperties: {placeholder: 'Contain a text in success case'},
+          propExtraProperties: { placeholder: 'Contain a text in success case' },
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.InputText,
           textFieldMeta: {
@@ -241,13 +237,13 @@ export default function ActionCreation() {
           propValue: 'CONSOLE',
           propDefaultValue: 'CONSOLE',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: [              
-              {label: "CONSOLE", value: 'CONSOLE'}, 
-              {label: "DATABASE", value: 'DATABASE'}
+            selections: [
+              { label: "CONSOLE", value: 'CONSOLE' },
+              { label: "DATABASE", value: 'DATABASE' }
             ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
@@ -266,13 +262,13 @@ export default function ActionCreation() {
           propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
           propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
             selections: [
-              {label: "EXECUTE_WITH_COMPLETABLE_FUTURE", value: 'EXECUTE_WITH_COMPLETABLE_FUTURE'}, 
-              {label: "EXECUTE_WITH_EXECUTOR_SERVICE", value: 'EXECUTE_WITH_EXECUTOR_SERVICE'}
+              { label: "EXECUTE_WITH_COMPLETABLE_FUTURE", value: 'EXECUTE_WITH_COMPLETABLE_FUTURE' },
+              { label: "EXECUTE_WITH_EXECUTOR_SERVICE", value: 'EXECUTE_WITH_EXECUTOR_SERVICE' }
             ],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
@@ -288,7 +284,7 @@ export default function ActionCreation() {
           propDefaultValue: '{}',
           disabled: true,
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
@@ -310,7 +306,7 @@ export default function ActionCreation() {
           propDefaultValue: '{}',
           disabled: true,
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
@@ -426,16 +422,16 @@ export default function ActionCreation() {
         actionIcon: <TimelapseIcon />,
         actionLabel: "Load sample",
         actionName: "loadSample",
-        onClick: ()  => {
+        onClick: () => {
           Object.keys(SAMPLE_ENDPOINT_DATA).forEach(propertyKey => {
             let propertyValue = SAMPLE_ENDPOINT_DATA[propertyKey]
             stepMetadatas[0].properties.filter(p => p.propName).forEach(p => {
               switch (p.propType) {
                 case PropType.InputText:
-                  p.textFieldMeta?.onChangeEvent({target: {value: propertyValue, name: propertyKey}})
+                  p.textFieldMeta?.onChangeEvent({ target: { value: propertyValue, name: propertyKey } })
                   break;
                 case PropType.Textarea:
-                  p.textareaFieldMeta?.onChangeEvent({target: {value: propertyValue, name: propertyKey}})
+                  p.textareaFieldMeta?.onChangeEvent({ target: { value: propertyValue, name: propertyKey } })
                   break;
                 case PropType.Selection:
                 case PropType.CodeEditor:
@@ -452,7 +448,7 @@ export default function ActionCreation() {
         actionIcon: <ClearAllIcon />,
         actionLabel: "Clear sample",
         actionName: "clearAll",
-        onClick: ()  => {
+        onClick: () => {
           Object.keys(SAMPLE_ENDPOINT_DATA).forEach(propertyKey => {
             setStepMetadatas(onchangeStepDefault(propertyKey, ''))
           })
@@ -462,19 +458,10 @@ export default function ActionCreation() {
   }
 
 
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
-  }
-
   return (
     <Stack spacing={4}>
       <PageEntityRender {...initialPageEntityMetdata} />
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }
