@@ -35,8 +35,7 @@ public class EndpointSetting {
     @Column(nullable = false)
     private String method;
 
-    @Lob
-    @Column
+    @Column(length = 2048)
     private String data;
 
     @Column
@@ -45,8 +44,7 @@ public class EndpointSetting {
     @Column
     private Integer noParallelThread;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(length = 2048)
     private String columnMetadata;
 
     @Column

@@ -23,6 +23,8 @@ import com.hoatv.task.mgmt.entities.TaskEntry;
 import com.hoatv.task.mgmt.services.TaskFactory;
 import com.hoatv.task.mgmt.services.TaskMgmtService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -200,19 +202,22 @@ public class ExtRestDataService {
     }
 
     @TimingMetricMonitor
+    @Transactional
     public Page<EndpointSummaryVO> getAllExtEndpoints(String application, Pageable pageable) {
 
         if (Objects.isNull(application)) {
             Page<EndpointSetting> endpointSettings = extEndpointSettingRepository.findAll(pageable);
             return endpointSettings.map(p -> {
                 EndpointExecutionResult byEndpointSetting = extExecutionResultRepository.findByEndpointSetting(p);
-                return p.toEndpointSummaryVO().elapsedTime(byEndpointSetting.getElapsedTime()).build();
+                String elapsedTime = byEndpointSetting == null ? null : byEndpointSetting.getElapsedTime();
+                return p.toEndpointSummaryVO().elapsedTime(elapsedTime).build();
             });
         }
         Page<EndpointSetting> endpointConfigsByApplication = extEndpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
         return endpointConfigsByApplication.map(p -> {
             EndpointExecutionResult byEndpointSetting = extExecutionResultRepository.findByEndpointSetting(p);
-            return p.toEndpointSummaryVO().elapsedTime(byEndpointSetting.getElapsedTime()).build();
+            String elapsedTime = byEndpointSetting == null ? null : byEndpointSetting.getElapsedTime();
+            return p.toEndpointSummaryVO().elapsedTime(elapsedTime).build();
         });
     }
 
