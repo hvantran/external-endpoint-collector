@@ -1,15 +1,14 @@
 import { Stack, ThemeProvider } from '@mui/material'
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import PrimarySearchAppBar from './ResponsiveAppBar'
-import HomeContent from './components/HomeContent'
-import ExtEndpointSummary from './components/ext-endpoints/ExtEndpointSummary'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import ErrorPage from './components/common/ErrorPage'
+import ExtEndpointCreation from './components/ext-endpoints/ExtEndpointCreation'
 import ExtEndpointDetails from './components/ext-endpoints/ExtEndpointDetails'
 import ExtEndpointResponseDetails from './components/ext-endpoints/ExtEndpointResponseDetails'
-import ExtEndpointCreation from './components/ext-endpoints/ExtEndpointCreation'
-import ErrorPage from './components/common/ErrorPage'
+import ExtEndpointSummary from './components/ext-endpoints/ExtEndpointSummary'
 import { DEFAULT_THEME } from './components/GenericConstants'
-import { ToastContainer } from 'react-toastify'
+import PrimarySearchAppBar from './ResponsiveAppBar'
 
 function App () {
   return (
@@ -19,9 +18,10 @@ function App () {
         <Routes>
           <Route
             path='/'
-            element={<HomeContent />}
+            element={<Navigate to="/endpoints" />}
             errorElement={<ErrorPage />}
-          ></Route>
+          >
+          </Route>
           <Route path='/endpoints' element={<ExtEndpointSummary />}></Route>
           <Route
             path='/endpoints/new'
