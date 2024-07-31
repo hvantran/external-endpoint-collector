@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldNameConstants;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.time.temporal.ChronoUnit;
 @Getter
 @Setter
 @ToString
+@FieldNameConstants
 @NoArgsConstructor
 public class EndpointExecutionResult {
 

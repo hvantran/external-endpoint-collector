@@ -3,6 +3,8 @@ package com.hoatv.ext.endpoint.controllers;
 import com.hoatv.ext.endpoint.dtos.EndpointResponseVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSummaryVO;
+import com.hoatv.ext.endpoint.models.EndpointResponse;
+import com.hoatv.ext.endpoint.models.EndpointSetting;
 import com.hoatv.ext.endpoint.services.ExtRestDataService;
 import jakarta.validation.Valid;
 
@@ -36,7 +38,10 @@ public class ExtRestDataController {
         @RequestParam(name = "pageIndex") int pageIndex,
         @RequestParam(name = "pageSize") int pageSize) {
 
-        Sort defaultSorting = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.asc("application"));
+        Sort defaultSorting = Sort.by(
+                Sort.Order.desc(EndpointSetting.Fields.createdAt), 
+                Sort.Order.asc(EndpointSetting.Fields.application)
+        );
         Page<EndpointSummaryVO> allExtEndpoints =
             extRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(allExtEndpoints);
@@ -54,7 +59,7 @@ public class ExtRestDataController {
                                                         @RequestParam(name = "pageIndex") int pageIndex,
                                                         @RequestParam(name = "pageSize") int pageSize) {
 
-        Sort defaultSorting = Sort.by(Sort.Order.asc("column1"));
+        Sort defaultSorting = Sort.by(Sort.Order.asc(EndpointResponse.Fields.column1));
         Page<EndpointResponseVO> endpointResponses =
             extRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);
@@ -65,7 +70,7 @@ public class ExtRestDataController {
                                                         @RequestParam(name = "pageIndex") int pageIndex,
                                                         @RequestParam(name = "pageSize") int pageSize) {
 
-        Sort defaultSorting = Sort.by(Sort.Order.asc("column1"));
+        Sort defaultSorting = Sort.by(Sort.Order.asc(EndpointResponse.Fields.column1));
         Page<EndpointResponseVO> endpointResponses =
             extRestDataService.getEndpointResponses(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);

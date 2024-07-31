@@ -3,6 +3,7 @@ package com.hoatv.ext.endpoint.models;
 import com.hoatv.ext.endpoint.dtos.EndpointResponseVO;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 
 @Entity
@@ -10,6 +11,7 @@ import lombok.*;
 @Setter
 @ToString
 @NoArgsConstructor
+@FieldNameConstants
 @AllArgsConstructor
 @Table(indexes = @Index(columnList = "column1"))
 public class EndpointResponse {

@@ -3,6 +3,7 @@ package com.hoatv.ext.endpoint.models;
 import com.hoatv.ext.endpoint.dtos.*;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldNameConstants
 public class EndpointSetting {
 
     @Id
