@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>endpoint-collector-backend</artifactId>
-    <name>microservices/ext-endpoint-collector</name>
+    <name>microservices/endpoint-collector-backend</name>
 
     <properties>
         <application.startup.class>com.hoatv.ext.endpoint.ExtEndpointApplication</application.startup.class>

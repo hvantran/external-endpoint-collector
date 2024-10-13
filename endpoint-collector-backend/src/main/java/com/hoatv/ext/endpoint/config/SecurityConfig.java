@@ -41,7 +41,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .requestMatchers("/ext-endpoint-collector/**")
+                .requestMatchers("/endpoint-collector-backend/**")
                 .hasRole("basic")
                 .anyRequest()
                 .permitAll();
