@@ -5,7 +5,7 @@ import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSummaryVO;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
-import com.hoatv.ext.endpoint.services.ExtRestDataService;
+import com.hoatv.ext.endpoint.services.ExternalRestDataService;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
@@ -17,18 +17,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/endpoints", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ExtRestDataController {
+public class EndpointController {
 
-    private final ExtRestDataService extRestDataService;
+    private final ExternalRestDataService externalRestDataService;
 
-    public ExtRestDataController (ExtRestDataService extRestDataService) {
-        this.extRestDataService = extRestDataService;
+    public EndpointController(ExternalRestDataService externalRestDataService) {
+        this.externalRestDataService = externalRestDataService;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addExtEndpoint (@Valid @RequestBody EndpointSettingVO endpointSettingVO) {
 
-        Long extEndpoint = extRestDataService.addExtEndpoint(endpointSettingVO);
+        Long extEndpoint = externalRestDataService.createExternalEndpoint(endpointSettingVO);
         return ResponseEntity.ok(String.format("{\"endpointId\": %s}", extEndpoint));
     }
 
@@ -43,14 +43,14 @@ public class ExtRestDataController {
                 Sort.Order.asc(EndpointSetting.Fields.application)
         );
         Page<EndpointSummaryVO> allExtEndpoints =
-            extRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
+            externalRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(allExtEndpoints);
     }
 
     @DeleteMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getEndpointResponses (@PathVariable("endpointId") Long endpointId) {
 
-        boolean isDeleted = extRestDataService.deleteEndpoint(endpointId);
+        boolean isDeleted = externalRestDataService.deleteEndpoint(endpointId);
         return ResponseEntity.ok(String.format("{\"message\": %s}", isDeleted));
     }
 
@@ -61,7 +61,7 @@ public class ExtRestDataController {
 
         Sort defaultSorting = Sort.by(Sort.Order.asc(EndpointResponse.Fields.column1));
         Page<EndpointResponseVO> endpointResponses =
-            extRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize, defaultSorting));
+            externalRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);
     }
 
@@ -72,7 +72,7 @@ public class ExtRestDataController {
 
         Sort defaultSorting = Sort.by(Sort.Order.asc(EndpointResponse.Fields.column1));
         Page<EndpointResponseVO> endpointResponses =
-            extRestDataService.getEndpointResponses(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
+            externalRestDataService.getEndpointResponses(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);
     }
 }

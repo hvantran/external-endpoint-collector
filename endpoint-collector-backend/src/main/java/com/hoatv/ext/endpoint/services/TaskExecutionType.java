@@ -6,7 +6,7 @@ import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
 import com.hoatv.ext.endpoint.dtos.ExtTaskReportVO;
 import com.hoatv.ext.endpoint.dtos.InputVO;
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
-import com.hoatv.ext.endpoint.repositories.ExtExecutionResultRepository;
+import com.hoatv.ext.endpoint.repositories.ExecutionResultRepository;
 import com.hoatv.ext.endpoint.utils.SaltGeneratorUtils;
 import com.hoatv.fwk.common.services.*;
 import com.hoatv.system.health.metrics.MethodStatisticCollector;
@@ -41,17 +41,17 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                 MethodStatisticCollector methodStatisticCollector = executionContext.methodStatisticCollector;
                 DataGeneratorVO dataGeneratorVO = executionContext.dataGeneratorVO;
                 String taskName = executionContext.taskName;
-                ExtExecutionResultRepository extExecutionResultRepository = executionContext.extExecutionResultRepository;
+                ExecutionResultRepository extExecutionResultRepository = executionContext.extExecutionResultRepository;
                 EndpointExecutionResult executionResult = executionContext.executionResult;
 
 
                 try (GenericHttpClientPool httpClientPool = HttpClientFactory.INSTANCE.getGenericHttpClientPool(input.getTaskName(), noParallelThread, 2000);
-                     TaskMgmtService taskMgmtExecutorV2 = TaskFactory.INSTANCE.getTaskMgmtService(noParallelThread, 5000, application)) {
-
+                    TaskMgmtService taskMgmtExecutorV2 = TaskFactory.INSTANCE.getTaskMgmtService(noParallelThread, 5000, application)) {
+                    int previousNumberOfCompleteTasks = executionResult.getNumberOfCompletedTasks();
                     for (int index = 1; index <= noAttemptTimes; index++) {
 
                         String executionTaskName = taskName.concat(String.valueOf(index));
-                        ExtTaskEntry extTaskEntry = ExtTaskEntry.builder()
+                        ExternalTaskEntry externalTaskEntry = ExternalTaskEntry.builder()
                                 .input(input)
                                 .index(index)
                                 .methodStatisticCollector(methodStatisticCollector)
@@ -64,9 +64,10 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
 
                         CheckedFunction<Object, TaskEntry> taskEntryFunc = TaskEntry.fromObject(executionTaskName,
                                 application);
-                        TaskEntry taskEntry = taskEntryFunc.apply(extTaskEntry);
+                        TaskEntry taskEntry = taskEntryFunc.apply(externalTaskEntry);
                         taskMgmtExecutorV2.execute(taskEntry);
-                        savePercentComplete(extExecutionResultRepository, noAttemptTimes, executionResult, index);
+                        int currentTaskIndex = index + previousNumberOfCompleteTasks;
+                        savePercentComplete(extExecutionResultRepository, executionResult, currentTaskIndex);
                     }
                 }
                 LOGGER.info("{} is completed successfully.", taskName);
@@ -90,7 +91,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                 MethodStatisticCollector methodStatisticCollector = executionContext.methodStatisticCollector;
                 DataGeneratorVO dataGeneratorVO = executionContext.dataGeneratorVO;
                 String taskName = executionContext.taskName;
-                ExtExecutionResultRepository extExecutionResultRepository = executionContext.extExecutionResultRepository;
+                ExecutionResultRepository executionResultRepository = executionContext.extExecutionResultRepository;
                 EndpointExecutionResult executionResult = executionContext.executionResult;
 
                 int numberOfProcess = Runtime.getRuntime().availableProcessors();
@@ -107,7 +108,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                              "CPU-" + application);
                      TaskMgmtServiceV1 httpClientThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(
                              noParallelThread, 5000, application)) {
-
+                    int previousNumberOfCompleteTasks = executionResult.getNumberOfCompletedTasks();
                     for (int index = 1; index <= noAttemptTimes; index++) {
                         int finalIndex = index;
                         CompletableFuture.supplyAsync(() -> {
@@ -119,7 +120,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                                 }, cpuBoundThreadPool)
                                 .thenApplyAsync(extTaskReportVO -> {
                                     String attemptValue = extTaskReportVO.getAttemptValue();
-                                    GenericHttpClientPool.ExecutionTemplate<String> executionTemplate = ExtTaskEntry.getExecutionTemplate(
+                                    GenericHttpClientPool.ExecutionTemplate<String> executionTemplate = ExternalTaskEntry.getExecutionTemplate(
                                             extEndpoint, extSupportedMethod, data, attemptValue, headers);
                                     String result = httpClientPool.executeWithTemplate(executionTemplate);
                                     extTaskReportVO.setExecutionResult(result);
@@ -138,7 +139,8 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                                     methodStatisticCollector.addMethodStatistics("endpoint-processing-data-task", "ms",
                                             elapsedTime);
                                 });
-                        savePercentComplete(extExecutionResultRepository, noAttemptTimes, executionResult, index);
+                        int currentTaskIndex = index + previousNumberOfCompleteTasks;
+                        savePercentComplete(executionResultRepository, executionResult, currentTaskIndex);
                     }
                     LOGGER.info("{} is completed successfully.", taskName);
                     return null;
@@ -149,15 +151,16 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskExecutionType.class);
 
-    void savePercentComplete(ExtExecutionResultRepository extExecutionResultRepository, int noAttemptTimes, EndpointExecutionResult executionResult, int index) {
+    void savePercentComplete(ExecutionResultRepository executionResultRepository, 
+                             EndpointExecutionResult executionResult, int index) {
 
         int percentComplete = executionResult.getPercentComplete();
-        int nextPercentComplete = index * 100 / noAttemptTimes;
+        int nextPercentComplete = index * 100 / executionResult.getNumberOfTasks();
 
         if (percentComplete != nextPercentComplete) {
             executionResult.setNumberOfCompletedTasks(index);
             executionResult.setPercentComplete(nextPercentComplete);
-            extExecutionResultRepository.save(executionResult);
+            executionResultRepository.save(executionResult);
         }
     }
 }

@@ -12,7 +12,8 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface ExtEndpointResponseRepository extends JpaRepository<EndpointResponse, Long> {
+public interface EndpointResponseRepository extends JpaRepository<EndpointResponse, Long> {
+    
     Page<EndpointResponse> findByEndpointSetting(EndpointSetting endpointSetting, Pageable pageable);
 
     Page<EndpointResponse> findByEndpointSettingIn(List<EndpointSetting> endpointConfigSettings, Pageable pageable);

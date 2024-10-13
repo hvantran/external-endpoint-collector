@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Transactional
-public interface ExtEndpointSettingRepository extends JpaRepository<EndpointSetting, Long> {
+public interface EndpointSettingRepository extends JpaRepository<EndpointSetting, Long> {
 
     Page<EndpointSetting> findEndpointConfigsByApplication(String application, Pageable pageable);
 }

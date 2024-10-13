@@ -1,6 +1,7 @@
 package com.hoatv.ext.endpoint.models;
 
 import com.hoatv.ext.endpoint.dtos.*;
+import com.hoatv.ext.endpoint.utils.SaltGeneratorUtils;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
@@ -59,6 +60,9 @@ public class EndpointSetting {
     private String generatorSaltStartWith;
 
     @Column
+    private String generatorStrategy;
+
+    @Column
     private String successCriteria;
 
     @Column
@@ -83,7 +87,7 @@ public class EndpointSetting {
         createdAt = LocalDateTime.now();
     }
 
-    public EndpointSettingVO toEndpointConfigVO() {
+    public EndpointSettingVO toEndpointSettingVO() {
 
         RequestInfoVO requestInfo = RequestInfoVO.builder()
                 .data(data)
@@ -93,6 +97,7 @@ public class EndpointSetting {
         DataGeneratorInfoVO dataGeneratorInfo = DataGeneratorInfoVO.builder()
                 .generatorMethodName(generatorMethodName)
                 .generatorSaltLength(generatorSaltLength)
+                .generatorStrategy(generatorStrategy)
                 .generatorSaltStartWith(generatorSaltStartWith)
                 .build();
         InputVO input = InputVO.builder()
@@ -132,6 +137,7 @@ public class EndpointSetting {
                         .dataGeneratorInfo(DataGeneratorInfoVO.builder()
                                 .generatorMethodName(generatorMethodName)
                                 .generatorSaltLength(generatorSaltLength)
+                                .generatorStrategy(generatorStrategy)
                                 .generatorSaltStartWith(generatorSaltStartWith)
                                 .build())
                         .requestInfo(RequestInfoVO.builder()
@@ -165,6 +171,7 @@ public class EndpointSetting {
                 .noAttemptTimes(input.getNoAttemptTimes())
                 .noParallelThread(input.getNoParallelThread())
                 .columnMetadata(input.getColumnMetadata())
+                .generatorStrategy(dataGeneratorInfo.getGeneratorStrategy())
                 .generatorMethodName(dataGeneratorInfo.getGeneratorMethodName())
                 .generatorSaltLength(dataGeneratorInfo.getGeneratorSaltLength())
                 .generatorSaltStartWith(dataGeneratorInfo.getGeneratorSaltStartWith())

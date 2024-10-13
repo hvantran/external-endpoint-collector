@@ -10,11 +10,11 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan({"com.hoatv.ext.endpoint", "com.hoatv.springboot.common"})
-public class ExtEndpointApplication {
+public class ExternalEndpointApplication {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(ExtEndpointApplication.class);
+        SpringApplication.run(ExternalEndpointApplication.class);
     }
 
 

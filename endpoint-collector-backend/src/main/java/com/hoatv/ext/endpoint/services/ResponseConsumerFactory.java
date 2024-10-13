@@ -2,7 +2,7 @@ package com.hoatv.ext.endpoint.services;
 
 import com.hoatv.ext.endpoint.api.ResponseConsumer;
 import com.hoatv.ext.endpoint.api.ResponseConsumerType;
-import com.hoatv.ext.endpoint.repositories.ExtEndpointResponseRepository;
+import com.hoatv.ext.endpoint.repositories.EndpointResponseRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +14,9 @@ public class ResponseConsumerFactory {
 
     private final Map<ResponseConsumerType, ResponseConsumer> consumerRegistry = new EnumMap<>(ResponseConsumerType.class);
 
-    private final ExtEndpointResponseRepository endpointResponseRepository;
+    private final EndpointResponseRepository endpointResponseRepository;
 
-    public ResponseConsumerFactory(ExtEndpointResponseRepository endpointResponseRepository) {
+    public ResponseConsumerFactory(EndpointResponseRepository endpointResponseRepository) {
 
         this.endpointResponseRepository = endpointResponseRepository;
     }

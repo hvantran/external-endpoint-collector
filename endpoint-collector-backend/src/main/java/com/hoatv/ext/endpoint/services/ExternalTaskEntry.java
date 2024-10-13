@@ -22,9 +22,9 @@ import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 
 @Builder
-public class ExtTaskEntry implements Callable<Void> {
+public class ExternalTaskEntry implements Callable<Void> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtTaskEntry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalTaskEntry.class);
 
     private static final HttpClientService HTTP_CLIENT_SERVICE = HttpClientService.INSTANCE;
 

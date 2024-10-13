@@ -14,7 +14,7 @@
     <name>microservices/endpoint-collector-backend</name>
 
     <properties>
-        <application.startup.class>com.hoatv.ext.endpoint.ExtEndpointApplication</application.startup.class>
+        <application.startup.class>com.hoatv.ext.endpoint.ExternalEndpointApplication</application.startup.class>
     </properties>
 
     <dependencies>

@@ -6,7 +6,7 @@ import com.hoatv.ext.endpoint.dtos.MetadataVO;
 import com.hoatv.ext.endpoint.dtos.MetadataVO.ColumnMetadataVO;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
-import com.hoatv.ext.endpoint.repositories.ExtEndpointResponseRepository;
+import com.hoatv.ext.endpoint.repositories.EndpointResponseRepository;
 import com.hoatv.ext.endpoint.utils.DecryptUtils;
 import com.hoatv.fwk.common.services.CheckedConsumer;
 import com.jayway.jsonpath.Configuration;
@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 public class DBResponseConsumer implements ResponseConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBResponseConsumer.class);
 
-    private final ExtEndpointResponseRepository endpointResponseRepository;
+    private final EndpointResponseRepository endpointResponseRepository;
 
     @Override
     public ResponseConsumerType getResponseConsumerType() {
