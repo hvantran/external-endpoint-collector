@@ -22,9 +22,10 @@ import {
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
 import { useNavigate } from 'react-router-dom';
-import { EXT_ENDPOINT_BACKEND_URL, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
+import { EndpointBackendClient, EXT_ENDPOINT_BACKEND_URL, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
 import PageEntityRender from '../renders/PageEntityRender';
 import TextTruncate from '../common/TextTruncate';
+import { Gauge } from '@mui/x-charts';
 
 
 
@@ -35,7 +36,7 @@ export default function ExtEndpointSummary() {
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(10);
-
+  const [orderBy, setOrderBy] = React.useState('-application');
   const restClient = new RestClient(setCircleProcessOpen);
 
   const breadcrumbs = [
@@ -52,6 +53,34 @@ export default function ExtEndpointSummary() {
     { id: 'application', label: 'Application', minWidth: 100 },
     { id: 'taskName', label: 'Task', minWidth: 100 },
     {
+      id: 'extEndpoint',
+      label: 'Target URL',
+      minWidth: 170,
+      align: 'left',
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />)
+    },
+    {
+      id: 'numberOfCompletedTasks',
+      label: 'Number of completed',
+      minWidth: 170,
+      align: 'left'
+    },
+    {
+      id: 'percentCompleted',
+      label: 'Percent completed',
+      minWidth: 170,
+      align: 'left',
+      format: (value: number) => (<Gauge
+        width={75}
+        height={75}
+        value={value}
+        startAngle={0}
+        endAngle={360}
+        innerRadius="60%"
+        outerRadius="100%"
+      />)
+    },
+    {
       id: 'createdAt',
       label: 'Created at',
       minWidth: 100,
@@ -62,69 +91,6 @@ export default function ExtEndpointSummary() {
       id: 'elapsedTime',
       label: 'Elapsed time',
       minWidth: 100,
-      align: 'left',
-      format: (value: string) => value,
-    },
-    {
-      id: 'responseConsumerType',
-      label: 'Targeting',
-      minWidth: 100,
-      align: 'left',
-      format: (value: string) => value,
-    },
-    {
-      id: 'executorServiceType',
-      label: 'Executor',
-      minWidth: 100,
-      align: 'left',
-      format: (value: string) => value,
-    },
-    {
-      id: 'fromPosition',
-      label: 'From',
-      minWidth: 170,
-      align: 'left',
-      format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'noAttemptTimes',
-      label: 'Sample times',
-      minWidth: 100,
-      align: 'left',
-      format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'noParallelThread',
-      label: 'No parallel threads',
-      minWidth: 170,
-      align: 'left',
-      format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'extEndpoint',
-      label: 'Target URL',
-      minWidth: 170,
-      align: 'left',
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />)
-    },
-    {
-      id: 'extEndpointMethod',
-      label: 'Method',
-      minWidth: 100,
-      align: 'left',
-      format: (value: string) => value,
-    },
-    {
-      id: 'extEndpointData',
-      label: 'Data',
-      minWidth: 170,
-      align: 'left',
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />)
-    },
-    {
-      id: 'successCriteria',
-      label: 'Success criteria',
-      minWidth: 150,
       align: 'left',
       format: (value: string) => value,
     },
@@ -148,73 +114,32 @@ export default function ExtEndpointSummary() {
           actionLabel: "Delete endpoint",
           actionName: "deletection",
           onClick: (row: ExtEndpointOverview) => {
-            return () => deleteEndpointCollector(row.endpointId)
+            return () => {
+              EndpointBackendClient.deleteEndpointCollector(row.endpointId, restClient, () => {
+                EndpointBackendClient.loadEndpointSummaryAsync(
+                  pageIndex,
+                  pageSize,
+                  orderBy,
+                  restClient,
+                  (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
+                );
+              })
+            }
           }
         }
       ]
     }
   ];
 
-
-  const deleteEndpointCollector = async (endpointId: number) => {
-
-    const requestOptions = {
-      method: "DELETE",
-      headers: {
-        "Accept": "application/json"
-      }
-    }
-    const targetURL = `${EXT_ENDPOINT_BACKEND_URL}/${endpointId}`;
-    await restClient.sendRequest(requestOptions, targetURL, () => {
-      loadEndpointSummaryAsync(pagingOptions.pageIndex, pagingOptions.pageSize);
-      return undefined;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
-    });
-  }
-
-  const loadEndpointSummaryAsync = async (pageIndex: number, pageSize: number) => {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      }
-    }
-
-    const targetURL = `${EXT_ENDPOINT_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
-    await restClient.sendRequest(requestOptions, targetURL, async (response) => {
-      let extEndpointPagingResult = await response.json() as PagingResult;
-      extEndpointPagingResult.elementTransformCallback = (record) => {
-        const transfromRecord: ExtEndpointOverview = {
-          endpointId: record.endpointId,
-          application: record.input.application,
-          taskName: record.input.taskName,
-          noAttemptTimes: record.input.noAttemptTimes,
-          noParallelThread: record.input.noParallelThread,
-          extEndpoint: record.input.requestInfo.extEndpoint,
-          extEndpointMethod: record.input.requestInfo.method,
-          extEndpointData: record.input.requestInfo.data,
-          successCriteria: record.filter.successCriteria,
-          elapsedTime: record.elapsedTime,
-          createdAt: record.createdAt,
-          fromPosition: record.input.dataGeneratorInfo.generatorSaltStartWith,
-          responseConsumerType: record.output.responseConsumerType,
-          executorServiceType: record.input.executorServiceType
-        }
-        return transfromRecord;
-      }
-      setPagingResult(extEndpointPagingResult);
-      return { 'message': 'Load endpoints successfully!!', key: new Date().getTime() } as SnackbarMessage;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
-    });
-  }
-
   React.useEffect(() => {
-    loadEndpointSummaryAsync(pageIndex, pageSize);
-  }, [pageIndex, pageSize])
+    EndpointBackendClient.loadEndpointSummaryAsync(
+      pageIndex,
+      pageSize,
+      orderBy,
+      restClient,
+      (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
+    );
+  }, [pageIndex, pageSize, orderBy])
 
   const endpoints: Array<SpeedDialActionMetadata> = [
     {
@@ -233,15 +158,19 @@ export default function ExtEndpointSummary() {
     pageIndex,
     pageSize,
     component: 'div',
+    orderBy,
     rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number) => {
+    onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
+      setOrderBy(orderBy);
     }
   }
 
   let tableMetadata: TableMetadata = {
     columns,
+    name: "Endpoint Overview",
+    onRowClickCallback: (row: ExtEndpointOverview) => navigate(`/endpoints/${row.endpointId}`),
     pagingOptions: pagingOptions,
     pagingResult: pagingResult
   }
@@ -256,7 +185,13 @@ export default function ExtEndpointSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh endpoints",
         actionName: "refreshAction",
-        onClick: () => loadEndpointSummaryAsync(pageIndex, pageSize)
+        onClick: () => EndpointBackendClient.loadEndpointSummaryAsync(
+          pageIndex,
+          pageSize,
+          orderBy,
+          restClient,
+          (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
+        )
       }
     ]
   }
