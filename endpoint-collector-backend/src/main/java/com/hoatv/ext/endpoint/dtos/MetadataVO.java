@@ -27,5 +27,9 @@ public class MetadataVO {
         private String mappingColumnName;
 
         private String decryptFunctionName;
+        
+        private String displayName;
+
+        private boolean ignoreEmpty;
     }
 }

@@ -59,6 +59,10 @@ public class DBResponseConsumer implements ResponseConsumer {
                     value = (String) decryptMethod.invoke(DecryptUtils.class, value);
                 }
 
+                if (StringUtils.isEmpty(value) && column.isIgnoreEmpty()) {
+                    return;
+                }
+
                 Method setMethod = EndpointResponse.class.getMethod(getMethodName, String.class);
                 setMethod.invoke(endpointResponse, value);
             };

@@ -23,5 +23,9 @@ public class EndpointSummaryVO {
     private String elapsedTime;
 
     private String createdAt;
+    
+    private Integer numberOfCompletedTasks;
+    
+    private Integer percentCompleted;
 }
 

@@ -258,10 +258,23 @@ public class ExternalRestDataService {
             Page<EndpointSetting> endpointSettings = endpointSettingRepository.findAll(pageable);
             return endpointSettings.map(p -> {
                 EndpointExecutionResult byEndpointSetting = executionResultRepository.findByEndpointSetting(p);
-                String elapsedTime = byEndpointSetting == null ? null : byEndpointSetting.getElapsedTime();
-                return p.toEndpointSummaryVO().elapsedTime(elapsedTime).build();
+                String elapsedTime = Optional.ofNullable(byEndpointSetting)
+                        .map(EndpointExecutionResult::getElapsedTime)
+                        .orElse(null);
+                Integer numberOfCompletedTasks = Optional.ofNullable(byEndpointSetting)
+                        .map(EndpointExecutionResult::getNumberOfCompletedTasks)
+                        .orElse(0);
+                Integer percentCompleted = Optional.ofNullable(byEndpointSetting)
+                        .map(EndpointExecutionResult::getPercentComplete)
+                        .orElse(0);
+                return p.toEndpointSummaryVO()
+                        .elapsedTime(elapsedTime)
+                        .numberOfCompletedTasks(numberOfCompletedTasks)
+                        .percentCompleted(percentCompleted)
+                        .build();
             });
         }
+        
         Page<EndpointSetting> endpointConfigsByApplication = endpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
         return endpointConfigsByApplication.map(p -> {
             EndpointExecutionResult byEndpointSetting = executionResultRepository.findByEndpointSetting(p);
@@ -279,5 +292,12 @@ public class ExternalRestDataService {
         executionResultRepository.deleteByEndpointSetting(endpointSetting);
         endpointSettingRepository.deleteById(endpointId);
         return true;
+    }
+
+    public EndpointSettingVO getEndpointSetting(Long endpointId) {
+        Optional<EndpointSetting> endpointSettingsOp = endpointSettingRepository.findById(endpointId);
+        return endpointSettingsOp
+                .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)))
+                .toEndpointSettingVO();
     }
 }
