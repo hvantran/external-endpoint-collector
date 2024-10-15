@@ -1,4 +1,5 @@
 
+import PestControlIcon from '@mui/icons-material/PestControl';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
@@ -10,24 +11,23 @@ import {
   ColumnMetadata,
   LocalStorageService,
   onChangeProperty,
-  onchangeStepDefault,
   PageEntityMetadata,
   PagingOptionMetadata,
   PagingResult,
   PropertyMetadata,
   PropType,
   RestClient,
-  SnackbarMessage,
   TableMetadata
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { EndpointBackendClient, EndpointDetail, EXT_ENDPOINT_BACKEND_URL, ExtEndpointMetadata, ExtEndpointResponseOverview, OuputColumnMetadata, ROOT_BREADCRUMB } from '../AppConstants';
+import { EndpointBackendClient, EndpointDetail, ExtEndpointResponseOverview, OuputColumnMetadata, ROOT_BREADCRUMB } from '../AppConstants';
 
-import PageEntityRender from '../renders/PageEntityRender';
-import TextTruncate from '../common/TextTruncate';
 import { json } from '@codemirror/lang-json';
+import { red } from '@mui/material/colors';
+import TextTruncate from '../common/TextTruncate';
+import PageEntityRender from '../renders/PageEntityRender';
 
 const pageIndexStorageKey = "endpoint-collector-response-table-page-index"
 const pageSizeStorageKey = "endpoint-collector-response-table-page-size"
@@ -450,6 +450,14 @@ export default function ExtEndpointDetails() {
     ],
     breadcumbsMeta: breadcrumbs,
     pageEntityActions: [
+      {
+        actionIcon:
+          <Link underline="hover" key="1" color="black" target="_blank" href={`${process.env.REACT_APP_TROUBLESHOOTING_BASE_URL}app/r/s/IhzuH`} rel="noopener noreferrer">
+            <PestControlIcon sx={{color: red[900]}}/>
+          </Link>,
+        actionLabel: "Troubleshoot in Kibana",
+        actionName: "troubleshootAction"
+      },
       {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
