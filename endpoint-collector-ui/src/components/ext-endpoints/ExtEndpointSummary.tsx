@@ -8,35 +8,39 @@ import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { green, red } from '@mui/material/colors';
+import { Gauge } from '@mui/x-charts';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { EndpointBackendClient, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
 import {
   ColumnMetadata,
+  LocalStorageService,
   PageEntityMetadata,
   PagingOptionMetadata,
   PagingResult,
   RestClient,
-  SnackbarMessage,
   SpeedDialActionMetadata,
   TableMetadata,
   WithLink
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
-import { useNavigate } from 'react-router-dom';
-import { EndpointBackendClient, EXT_ENDPOINT_BACKEND_URL, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
-import PageEntityRender from '../renders/PageEntityRender';
 import TextTruncate from '../common/TextTruncate';
-import { Gauge } from '@mui/x-charts';
+import PageEntityRender from '../renders/PageEntityRender';
 
 
+const pageIndexStorageKey = "endpoint-collector-summary-table-page-index"
+const pageSizeStorageKey = "endpoint-collector-summary-table-page-size"
+const orderByStorageKey = "endpoint-collector-summary-table-order"
 
 export default function ExtEndpointSummary() {
   const navigate = useNavigate();
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [orderBy, setOrderBy] = React.useState('-application');
+  const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
+  const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
+  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-application'))
+
   const restClient = new RestClient(setCircleProcessOpen);
 
   const breadcrumbs = [
@@ -49,15 +53,32 @@ export default function ExtEndpointSummary() {
   ];
 
   const columns: ColumnMetadata[] = [
-    { id: 'endpointId', label: 'Endpoint ID', isHidden: true, minWidth: 100, isKeyColumn: true },
-    { id: 'application', label: 'Application', minWidth: 100 },
-    { id: 'taskName', label: 'Task', minWidth: 100 },
+    {
+      id: 'endpointId',
+      label: 'Endpoint ID', 
+      isHidden: true,
+      minWidth: 100, 
+      isKeyColumn: true
+    },
+    {
+      id: 'application',
+      label: 'Application',
+      minWidth: 100,
+      isSortable: true
+    },
+    { 
+      id: 'taskName', 
+      label: 'Task', 
+      minWidth: 100 ,
+      isSortable: true
+    },
     {
       id: 'extEndpoint',
       label: 'Target URL',
       minWidth: 170,
       align: 'left',
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />)
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />),
+      isSortable: true
     },
     {
       id: 'numberOfCompletedTasks',

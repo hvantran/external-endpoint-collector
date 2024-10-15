@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import React from 'react';
 import {
   ColumnMetadata,
+  LocalStorageService,
   onChangeProperty,
   onchangeStepDefault,
   PageEntityMetadata,
@@ -28,6 +29,9 @@ import PageEntityRender from '../renders/PageEntityRender';
 import TextTruncate from '../common/TextTruncate';
 import { json } from '@codemirror/lang-json';
 
+const pageIndexStorageKey = "endpoint-collector-response-table-page-index"
+const pageSizeStorageKey = "endpoint-collector-response-table-page-size"
+const orderByStorageKey = "endpoint-collector-response-table-order"
 
 export default function ExtEndpointDetails() {
   const targetAction = useParams();
@@ -35,9 +39,9 @@ export default function ExtEndpointDetails() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [orderBy, setOrderBy] = React.useState('-column1');
+  const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
+  const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
+  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-column1'))
   const restClient = new RestClient(setCircleProcessOpen);
 
   const endpointSettingId: string | undefined = targetAction.application;
@@ -60,60 +64,70 @@ export default function ExtEndpointDetails() {
     {
       id: 'column1',
       label: 'Column 1',
+      isSortable: true,
       minWidth: 100,
       isKeyColumn: true,
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column2',
+      isSortable: true,
       label: 'Column 2',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column3',
       label: 'Column 3',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={20} />)
     },
     {
       id: 'column4',
       label: 'Column 4',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column5',
       label: 'Column 5',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column6',
       label: 'Column 6',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column7',
       label: 'Column 7',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column8',
       label: 'Column 8',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column9',
       label: 'Column 9',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
     {
       id: 'column10',
       label: 'Column 10',
+      isSortable: true,
       align: 'left',
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />)
     },
@@ -133,8 +147,6 @@ export default function ExtEndpointDetails() {
       ]
     }
   ]);
-
-
 
   const [propertyMetadata, setPropertyMetadata] = React.useState<Array<PropertyMetadata>>(
     [

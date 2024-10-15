@@ -28,300 +28,299 @@ export default function ActionCreation() {
   const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
   const restClient = new RestClient(setCircleProcessOpen);
 
+  const externalEndpointProperties: PropertyMetadata[] = [
+    {
+      propName: 'application',
+      propLabel: 'Application',
+      propValue: '',
+      isRequired: true,
+      layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
+      valueElementProperties: { xs: 10 },
+      propDescription: 'The application name',
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+
+          setStepMetadatas(onchangeStepDefault(propName, propValue, (stepMetadata) => {
+            if (stepMetadata.name === 'extEndpointCreation') {
+              stepMetadata.label = propValue;
+            }
+          }));
+        }
+      }
+    },
+    {
+      propName: 'taskName',
+      propLabel: 'Task name',
+      propValue: '',
+      isRequired: true,
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'noAttemptTimes',
+      propLabel: 'Run times',
+      propValue: 1,
+      propDefaultValue: 1,
+      isRequired: true,
+      propExtraProperties: { type: "number" },
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'noParallelThread',
+      propLabel: 'Thread count',
+      propValue: 1,
+      propDefaultValue: 1,
+      isRequired: true,
+      propExtraProperties: { type: "number" },
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'extEndpoint',
+      propLabel: 'Targeting endpoint',
+      propValue: '',
+      isRequired: true,
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'extEndpointMethod',
+      propLabel: 'Http method',
+      propValue: 'GET',
+      propDefaultValue: 'GET',
+      isRequired: true,
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.Selection,
+      selectionMeta: {
+        selections: [
+          { label: "GET", value: 'GET' },
+          { label: "POST", value: 'POST' },
+          { label: "PUT", value: 'PUT' },
+          { label: "DELETE", value: 'DELETE' }
+        ],
+        onChangeEvent: function (event) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue, undefined, (propertyMetadata) => {
+            if (propertyMetadata.propName === 'extEndpointData') {
+              propertyMetadata.disabled = ["GET", "DELETE"].includes(propValue);
+            }
+          }));
+        }
+      }
+    },
+    {
+      propName: 'generatorSaltLength',
+      propLabel: 'Generator data length',
+      propValue: '',
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'generatorSaltStartWith',
+      propLabel: 'Generator start with',
+      propValue: '',
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'generatorStrategy',
+      propLabel: 'Generator data strategy',
+      propValue: 'NONE',
+      propDefaultValue: 'NONE',
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.Selection,
+      selectionMeta: {
+        selections: [
+          { label: "GET", value: 'GET' },
+          { label: "RANDOM", value: 'RANDOM' },
+          { label: "SEQUENCE", value: 'SEQUENCE' },
+          { label: "RANDOM_WITH_CONDITION", value: 'RANDOM_WITH_CONDITION' },
+          { label: "NONE", value: 'NONE' }
+        ],
+        onChangeEvent: function (event) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'successCriteria',
+      propLabel: 'Success condition',
+      propValue: '',
+      isRequired: true,
+      propExtraProperties: { placeholder: 'Contain a text in success case' },
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.InputText,
+      textFieldMeta: {
+        onChangeEvent: function (event: any) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'responseConsumerType',
+      propLabel: 'Response Type',
+      propValue: 'CONSOLE',
+      propDefaultValue: 'CONSOLE',
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.Selection,
+      selectionMeta: {
+        selections: [
+          { label: "CONSOLE", value: 'CONSOLE' },
+          { label: "DATABASE", value: 'DATABASE' }
+        ],
+        onChangeEvent: function (event) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue, undefined, (propertyMetadata) => {
+            if (propertyMetadata.propName === 'columnMetadata') {
+              propertyMetadata.disabled = !["DATABASE"].includes(propValue);
+            }
+          }));
+        }
+      }
+    },
+    {
+      propName: 'executorServiceType',
+      propLabel: 'Executor Service Type',
+      propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
+      propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
+      layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
+      labelElementProperties: { xs: 4, sx: { pl: 10 } },
+      valueElementProperties: { xs: 8 },
+      propType: PropType.Selection,
+      selectionMeta: {
+        selections: [
+          { label: "EXECUTE_WITH_COMPLETABLE_FUTURE", value: 'EXECUTE_WITH_COMPLETABLE_FUTURE' },
+          { label: "EXECUTE_WITH_EXECUTOR_SERVICE", value: 'EXECUTE_WITH_EXECUTOR_SERVICE' }
+        ],
+        onChangeEvent: function (event) {
+          let propValue = event.target.value;
+          let propName = event.target.name;
+          setStepMetadatas(onchangeStepDefault(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'extEndpointData',
+      propLabel: 'Data',
+      propValue: '{}',
+      propDefaultValue: '{}',
+      disabled: true,
+      layoutProperties: { xs: 12 },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
+      valueElementProperties: { xs: 10 },
+      isRequired: true,
+      propType: PropType.CodeEditor,
+      codeEditorMeta: {
+        codeLanguges: [json()],
+        onChangeEvent: function (propName) {
+          return (value, _) => {
+            let propValue = value;
+            setStepMetadatas(onchangeStepDefault(propName, propValue));
+          };
+        }
+      }
+    },
+    {
+      propName: 'columnMetadata',
+      propLabel: 'Output column metadata',
+      propValue: '{}',
+      propDefaultValue: '{}',
+      disabled: true,
+      layoutProperties: { xs: 12 },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
+      valueElementProperties: { xs: 10 },
+      isRequired: true,
+      propType: PropType.CodeEditor,
+      codeEditorMeta: {
+        codeLanguges: [json()],
+        onChangeEvent: function (propName) {
+          return (value, _) => {
+            let propValue = value;
+            setStepMetadatas(onchangeStepDefault(propName, propValue));
+          };
+        }
+      }
+    }
+  ];
   let initialStepMetadatas: Array<StepMetadata> = [
     {
       name: "extEndpointCreation",
       label: 'Endpoint metadata',
       description: 'This step is used to define an external endpoint information',
-      properties: [
-        {
-          propName: 'application',
-          propLabel: 'Application',
-          propValue: '',
-          isRequired: true,
-          layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 2, sx: { pl: 10 } },
-          valueElementProperties: { xs: 10 },
-          propDescription: 'The application name',
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-
-              setStepMetadatas(onchangeStepDefault(propName, propValue, (stepMetadata) => {
-                if (stepMetadata.name === 'extEndpointCreation') {
-                  stepMetadata.label = propValue;
-                }
-              }));
-            }
-          }
-        },
-        {
-          propName: 'taskName',
-          propLabel: 'Task name',
-          propValue: '',
-          isRequired: true,
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'noAttemptTimes',
-          propLabel: 'Run times',
-          propValue: 1,
-          propDefaultValue: 1,
-          isRequired: true,
-          propExtraProperties: { type: "number" },
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'noParallelThread',
-          propLabel: 'Thread count',
-          propValue: 1,
-          propDefaultValue: 1,
-          isRequired: true,
-          propExtraProperties: { type: "number" },
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'extEndpoint',
-          propLabel: 'Targeting endpoint',
-          propValue: '',
-          isRequired: true,
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'extEndpointMethod',
-          propLabel: 'Http method',
-          propValue: 'GET',
-          propDefaultValue: 'GET',
-          isRequired: true,
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.Selection,
-          selectionMeta: {
-            selections: [
-              { label: "GET", value: 'GET' },
-              { label: "POST", value: 'POST' },
-              { label: "PUT", value: 'PUT' },
-              { label: "DELETE", value: 'DELETE' }
-            ],
-            onChangeEvent: function (event) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue, undefined, (propertyMetadata) => {
-                if (propertyMetadata.propName === 'extEndpointData') {
-                  propertyMetadata.disabled = ["GET", "DELETE"].includes(propValue);
-                }
-              }));
-            }
-          }
-        },
-        {
-          propName: 'generatorSaltLength',
-          propLabel: 'Generator data length',
-          propValue: '',
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'generatorSaltStartWith',
-          propLabel: 'Generator start with',
-          propValue: '',
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'generatorStrategy',
-          propLabel: 'Generator data strategy',
-          propValue: 'NONE',
-          propDefaultValue: 'NONE',
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.Selection,
-          selectionMeta: {
-            selections: [
-              { label: "GET", value: 'GET' },
-              { label: "RANDOM", value: 'RANDOM' },
-              { label: "SEQUENCE", value: 'SEQUENCE' },
-              { label: "RANDOM_WITH_CONDITION", value: 'RANDOM_WITH_CONDITION' },
-              { label: "NONE", value: 'NONE' }
-            ],
-            onChangeEvent: function (event) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'successCriteria',
-          propLabel: 'Success condition',
-          propValue: '',
-          isRequired: true,
-          propExtraProperties: { placeholder: 'Contain a text in success case' },
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
-        },
-        {
-          propName: 'responseConsumerType',
-          propLabel: 'Response Type',
-          propValue: 'CONSOLE',
-          propDefaultValue: 'CONSOLE',
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.Selection,
-          selectionMeta: {
-            selections: [
-              { label: "CONSOLE", value: 'CONSOLE' },
-              { label: "DATABASE", value: 'DATABASE' }
-            ],
-            onChangeEvent: function (event) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue, undefined, (propertyMetadata) => {
-                if (propertyMetadata.propName === 'columnMetadata') {
-                  propertyMetadata.disabled = !["DATABASE"].includes(propValue);
-                }
-              }));
-            }
-          }
-        },
-        {
-          propName: 'executorServiceType',
-          propLabel: 'Executor Service Type',
-          propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
-          propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
-          propType: PropType.Selection,
-          selectionMeta: {
-            selections: [
-              { label: "EXECUTE_WITH_COMPLETABLE_FUTURE", value: 'EXECUTE_WITH_COMPLETABLE_FUTURE' },
-              { label: "EXECUTE_WITH_EXECUTOR_SERVICE", value: 'EXECUTE_WITH_EXECUTOR_SERVICE' }
-            ],
-            onChangeEvent: function (event) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue));
-            }
-          }
-        },
-        {
-          propName: 'extEndpointData',
-          propLabel: 'Data',
-          propValue: '{}',
-          propDefaultValue: '{}',
-          disabled: true,
-          layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2, sx: { pl: 10 } },
-          valueElementProperties: { xs: 10 },
-          isRequired: true,
-          propType: PropType.CodeEditor,
-          codeEditorMeta:
-          {
-            codeLanguges: [json()],
-            onChangeEvent: function (propName) {
-              return (value, _) => {
-                let propValue = value;
-                setStepMetadatas(onchangeStepDefault(propName, propValue))
-              }
-            }
-          }
-        },
-        {
-          propName: 'columnMetadata',
-          propLabel: 'Output column metadata',
-          propValue: '{}',
-          propDefaultValue: '{}',
-          disabled: true,
-          layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2, sx: { pl: 10 } },
-          valueElementProperties: { xs: 10 },
-          isRequired: true,
-          propType: PropType.CodeEditor,
-          codeEditorMeta:
-          {
-            codeLanguges: [json()],
-            onChangeEvent: function (propName) {
-              return (value, _) => {
-                let propValue = value;
-                setStepMetadatas(onchangeStepDefault(propName, propValue))
-              }
-            }
-          }
-        }
-      ]
+      properties: externalEndpointProperties
     },
     {
       name: "review",
