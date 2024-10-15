@@ -35,6 +35,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                 InputVO input = executionContext.input;
                 int noParallelThread = executionContext.noParallelThread;
                 int noAttemptTimes = executionContext.noAttemptTimes;
+                int noCompletedTasks = executionContext.noOfCompletedTasks;
                 EndpointSettingVO endpointSettingVO = executionContext.endpointSettingVO;
                 BiConsumer<String, String> responseConsumer = executionContext.successResponseConsumer;
                 BiConsumer<String, String> errorResponseConsumer = executionContext.errorResponseConsumer;
@@ -48,7 +49,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                 try (GenericHttpClientPool httpClientPool = HttpClientFactory.INSTANCE.getGenericHttpClientPool(input.getTaskName(), noParallelThread, 2000);
                     TaskMgmtService taskMgmtExecutorV2 = TaskFactory.INSTANCE.getTaskMgmtService(noParallelThread, 5000, application)) {
                     int previousNumberOfCompleteTasks = executionResult.getNumberOfCompletedTasks();
-                    for (int index = 1; index <= noAttemptTimes; index++) {
+                    for (int index = noCompletedTasks + 1; index <= noAttemptTimes; index++) {
 
                         String executionTaskName = taskName.concat(String.valueOf(index));
                         ExternalTaskEntry externalTaskEntry = ExternalTaskEntry.builder()
@@ -85,6 +86,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                 InputVO input = executionContext.input;
                 int noParallelThread = executionContext.noParallelThread;
                 int noAttemptTimes = executionContext.noAttemptTimes;
+                int noCompletedTasks = executionContext.noOfCompletedTasks;
                 EndpointSettingVO endpointSettingVO = executionContext.endpointSettingVO;
                 BiConsumer<String, String> responseConsumer = executionContext.successResponseConsumer;
                 BiConsumer<String, String> errorResponseConsumer = executionContext.errorResponseConsumer;
@@ -109,7 +111,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                      TaskMgmtServiceV1 httpClientThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(
                              noParallelThread, 5000, application)) {
                     int previousNumberOfCompleteTasks = executionResult.getNumberOfCompletedTasks();
-                    for (int index = 1; index <= noAttemptTimes; index++) {
+                    for (int index = noCompletedTasks + 1; index <= noAttemptTimes; index++) {
                         int finalIndex = index;
                         CompletableFuture.supplyAsync(() -> {
                                     CheckedSupplier<String> supplier = () -> SaltGeneratorUtils.generateSaltValue(

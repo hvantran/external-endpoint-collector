@@ -7,6 +7,7 @@ import com.hoatv.ext.endpoint.dtos.*;
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
+import com.hoatv.ext.endpoint.repositories.CustomEndpointResponseRepository;
 import com.hoatv.ext.endpoint.repositories.EndpointResponseRepository;
 import com.hoatv.ext.endpoint.repositories.EndpointSettingRepository;
 import com.hoatv.ext.endpoint.repositories.ExecutionResultRepository;
@@ -65,6 +66,8 @@ public class ExternalRestDataService {
 
     private final ResponseConsumerFactory responseConsumerFactory;
 
+    private final CustomEndpointResponseRepository customEndpointResponseRepository;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final AtomicInteger numberOfSuccessResponse = new AtomicInteger(0);
@@ -75,18 +78,15 @@ public class ExternalRestDataService {
                                    EndpointResponseRepository endpointResponseRepository,
                                    ExecutionResultRepository executionResultRepository,
                                    MethodStatisticCollector methodStatisticCollector,
-                                   ResponseConsumerFactory responseConsumerFactory) {
+                                   ResponseConsumerFactory responseConsumerFactory,
+                                   CustomEndpointResponseRepository customEndpointResponseRepository) {
 
         this.endpointSettingRepository = endpointSettingRepository;
         this.endpointResponseRepository = endpointResponseRepository;
         this.executionResultRepository = executionResultRepository;
         this.methodStatisticCollector = methodStatisticCollector;
         this.responseConsumerFactory = responseConsumerFactory;
-    }
-
-    private static Pair<EndpointSettingVO, EndpointExecutionResult> apply(EndpointExecutionResult p) {
-        EndpointSettingVO endpointSettingVO = p.getEndpointSetting().toEndpointSettingVO();
-        return Pair.of(endpointSettingVO, p);
+        this.customEndpointResponseRepository = customEndpointResponseRepository;
     }
 
     @Metric(name = "ext-number-of-success-responses")
@@ -98,7 +98,12 @@ public class ExternalRestDataService {
     public SimpleValue getNumberOfErrorResponse() {
         return new SimpleValue(numberOfErrorResponse.get());
     }
-    
+
+    private static Pair<EndpointSettingVO, EndpointExecutionResult> apply(EndpointExecutionResult p) {
+        EndpointSettingVO endpointSettingVO = p.getEndpointSetting().toEndpointSettingVO();
+        return Pair.of(endpointSettingVO, p);
+    }
+
     @PostConstruct
     public void init() {
         LOGGER.info("Force collecting data for incomplete tasks of applications");
@@ -107,30 +112,54 @@ public class ExternalRestDataService {
                 .stream()
                 .map(ExternalRestDataService::apply)
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-        
+
         incompleteTaskMap.forEach(((endpointSettingVO, executionResult) -> {
             EndpointSetting endpointSetting = executionResult.getEndpointSetting();
-            LOGGER.info("Start collecting data for incomplete application: {} - task: {}", endpointSetting.getApplication(), endpointSetting.getTaskName());
-            collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult);
+            Long endpointSettingId = endpointSetting.getId();
+            String columnMetadata = endpointSetting.getColumnMetadata();
+            CheckedSupplier<MetadataVO> columnMetadataVOSup = () -> objectMapper.readValue(columnMetadata, MetadataVO.class);
+            MetadataVO metadataVO = columnMetadataVOSup.get();
+            String generatorSaltStartWith = endpointSetting.getGeneratorSaltStartWith();
+            String lastRandomValue = metadataVO.getColumnMetadata().stream()
+                    .filter(p -> "random".equals(p.getFieldPath()))
+                    .findFirst().map(columnMetadataVO -> {
+                        String mappingColumnName = columnMetadataVO.getMappingColumnName();
+                        return customEndpointResponseRepository.findMaxValueByColumn(mappingColumnName, endpointSettingId);
+                    }).orElse(generatorSaltStartWith);
+            int numberOfCompletedTasks = getNumberOfCompletedTasks(lastRandomValue, generatorSaltStartWith);
+            collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult, numberOfCompletedTasks);
         }));
+    }
+
+    private int getNumberOfCompletedTasks(
+            String lastRandomValue,
+            String generateSaltStartWith) {
+        String lastRandomNumericOnly = lastRandomValue.replaceAll("\\D", "");
+        String saltNumericOnly = generateSaltStartWith.replaceAll("\\D", "");
+        return Integer.parseInt(lastRandomNumericOnly) - Integer.parseInt(saltNumericOnly);
     }
 
     public Long createExternalEndpoint(EndpointSettingVO endpointSettingVO) {
         EndpointSetting endpointSetting = createEndpointSetting(endpointSettingVO);
         int noAttemptTimes = endpointSettingVO.getInput().getNoAttemptTimes();
         EndpointExecutionResult executionResult = createExecutionResult(endpointSetting, noAttemptTimes);
-        LOGGER.info("Start collecting data from endpoint for application: {} - task: {}", endpointSetting.getApplication(), endpointSetting.getTaskName());
-        return collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult);
+        return collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult, 0);
     }
 
     private Long collectDataFromEndpoint(
-            EndpointSettingVO endpointSettingVO, 
-            EndpointSetting endpointSetting, 
-            EndpointExecutionResult executionResult) {
-        
+            EndpointSettingVO endpointSettingVO,
+            EndpointSetting endpointSetting,
+            EndpointExecutionResult executionResult,
+            int numberOfCompletedTasks) {
+
+        LOGGER.info("Start collecting data from endpoint for application: {} - task: {} - from: {} - {}",
+                endpointSetting.getApplication(),
+                endpointSetting.getTaskName(),
+                numberOfCompletedTasks,
+                endpointSetting.getNoAttemptTimes());
         TaskMgmtService taskMgmtExecutorV1 = TaskFactory.INSTANCE.getTaskMgmtService(1, 5000);
         TaskEntry mainTaskEntry = new TaskEntry();
-        Callable<Object> callable = getEndpointResponseTasks(endpointSetting, endpointSettingVO, executionResult);
+        Callable<Object> callable = getEndpointResponseTasks(endpointSetting, endpointSettingVO, executionResult, numberOfCompletedTasks);
         mainTaskEntry.setTaskHandler(callable);
         mainTaskEntry.setApplicationName("Main %s".formatted(endpointSetting.getTaskName()));
         mainTaskEntry.setName("Execute get endpoint response for %s".formatted(endpointSetting.getTaskName()));
@@ -150,10 +179,11 @@ public class ExternalRestDataService {
     }
 
     private Callable<Object> getEndpointResponseTasks(
-            EndpointSetting endpointSetting, 
+            EndpointSetting endpointSetting,
             EndpointSettingVO endpointSettingVO,
-            EndpointExecutionResult executionResult) {
-        
+            EndpointExecutionResult executionResult, 
+            int numberOfCompletedTasks) {
+
         // Metadata
         String columnMetadata = endpointSetting.getColumnMetadata();
         CheckedSupplier<MetadataVO> columnMetadataVOSup = () -> objectMapper.readValue(columnMetadata, MetadataVO.class);
@@ -163,7 +193,7 @@ public class ExternalRestDataService {
         String application = endpointSetting.getApplication();
         String taskName = endpointSetting.getTaskName();
         InputVO input = endpointSettingVO.getInput();
-        int noAttemptTimes = input.getNoAttemptTimes() - executionResult.getNumberOfCompletedTasks();
+        int noAttemptTimes = input.getNoAttemptTimes();
         int noParallelThread = endpointSetting.getNoParallelThread();
 
         // Generator data for executing http methods
@@ -172,8 +202,9 @@ public class ExternalRestDataService {
         String generatorSaltStartWith = Optional.ofNullable(endpointSetting.getGeneratorSaltStartWith()).orElse("");
         DataGeneratorInfoVO dataGeneratorInfo = input.getDataGeneratorInfo();
         GeneratorType generatorType = GeneratorType.valueOf(dataGeneratorInfo.getGeneratorStrategy());
+
         if (generatorType == GeneratorType.SEQUENCE) {
-            long startWithValue = Long.parseLong(generatorSaltStartWith) + executionResult.getNumberOfCompletedTasks();
+            long startWithValue = Long.parseLong(generatorSaltStartWith) + numberOfCompletedTasks;
             generatorSaltStartWith = String.valueOf(startWithValue);
         }
 
@@ -205,6 +236,7 @@ public class ExternalRestDataService {
                 .noAttemptTimes(noAttemptTimes)
                 .executionResult(executionResult)
                 .methodStatisticCollector(methodStatisticCollector)
+                .noOfCompletedTasks(numberOfCompletedTasks)
                 .noParallelThread(noParallelThread)
                 .dataGeneratorVO(dataGeneratorVO)
                 .endpointSettingVO(endpointSettingVO)
@@ -274,7 +306,7 @@ public class ExternalRestDataService {
                         .build();
             });
         }
-        
+
         Page<EndpointSetting> endpointConfigsByApplication = endpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
         return endpointConfigsByApplication.map(p -> {
             EndpointExecutionResult byEndpointSetting = executionResultRepository.findByEndpointSetting(p);

@@ -23,6 +23,8 @@ public class ExecutionContext {
     int noAttemptTimes;
 
     int noParallelThread;
+    
+    int noOfCompletedTasks;
 
     DataGeneratorVO dataGeneratorVO;
 
