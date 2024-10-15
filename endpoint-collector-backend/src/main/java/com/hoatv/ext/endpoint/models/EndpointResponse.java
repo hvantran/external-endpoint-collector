@@ -24,34 +24,34 @@ public class EndpointResponse {
     @JoinColumn(name = "endpointConfigId", nullable = false)
     private EndpointSetting endpointSetting;
 
-    @Column
+    @Column(length = 2048)
     private String column1;
 
-    @Column(length = 1024)
+    @Column(length = 2048)
     private String column2;
 
-    @Column(length = 1024)
+    @Column(length = 2048)
     private String column3;
 
-    @Column
+    @Column(length = 2048)
     private String column4;
 
-    @Column
+    @Column(length = 2048)
     private String column5;
 
-    @Column
+    @Column(length = 2048)
     private String column6;
 
-    @Column
+    @Column(length = 2048)
     private String column7;
 
-    @Column
+    @Column(length = 2048)
     private String column8;
 
-    @Column(length = 1024)
+    @Column(length = 2048)
     private String column9;
 
-    @Column(length = 1024)
+    @Column(length = 2048)
     private String column10;
 
     public EndpointResponseVO toEndpointResponseVO() {
