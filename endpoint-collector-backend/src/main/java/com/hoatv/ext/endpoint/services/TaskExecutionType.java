@@ -48,7 +48,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
 
                 try (GenericHttpClientPool httpClientPool = HttpClientFactory.INSTANCE.getGenericHttpClientPool(input.getTaskName(), noParallelThread, 2000);
                     TaskMgmtService taskMgmtExecutorV2 = TaskFactory.INSTANCE.getTaskMgmtService(noParallelThread, 5000, application)) {
-                    int previousNumberOfCompleteTasks = executionResult.getNumberOfCompletedTasks();
+                    int previousNumberOfCompleteTasks = executionContext.noOfCompletedTasks;
                     for (int index = noCompletedTasks + 1; index <= noAttemptTimes; index++) {
 
                         String executionTaskName = taskName.concat(String.valueOf(index));
@@ -110,7 +110,7 @@ public enum TaskExecutionType implements TaskExecutionImplementation {
                              "CPU-" + application);
                      TaskMgmtServiceV1 httpClientThreadPool = TaskFactory.INSTANCE.getTaskMgmtServiceV1(
                              noParallelThread, 5000, application)) {
-                    int previousNumberOfCompleteTasks = executionResult.getNumberOfCompletedTasks();
+                    int previousNumberOfCompleteTasks = executionContext.noOfCompletedTasks;
                     for (int index = noCompletedTasks + 1; index <= noAttemptTimes; index++) {
                         int finalIndex = index;
                         CompletableFuture.supplyAsync(() -> {
