@@ -77,7 +77,7 @@ export default function ExtEndpointSummary() {
       label: 'Target URL',
       minWidth: 170,
       align: 'left',
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} />),
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />),
       isSortable: true
     },
     {
@@ -109,7 +109,7 @@ export default function ExtEndpointSummary() {
       minWidth: 170,
       align: 'left',
       isSortable: true,
-      format: (value: number) => (<Typography variant="h6">{value}</Typography>)
+      format: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     },
     {
       id: 'createdAt',
