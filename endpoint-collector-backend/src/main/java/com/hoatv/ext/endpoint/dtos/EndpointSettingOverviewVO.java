@@ -10,22 +10,24 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class EndpointSummaryVO {
+public class EndpointSettingOverviewVO {
 
     private Long endpointId;
 
-    private InputVO input;
+    private String application;
 
-    private FilterVO filter;
+    private String taskName;
 
-    private OutputVO output;
+    private String targetURL;
 
     private String elapsedTime;
 
     private String createdAt;
-    
+
     private Integer numberOfCompletedTasks;
-    
+
+    private Integer numberOfResponses;
+
     private Integer percentCompleted;
 }
 

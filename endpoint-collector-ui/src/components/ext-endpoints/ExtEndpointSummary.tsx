@@ -39,7 +39,7 @@ export default function ExtEndpointSummary() {
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
-  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-application'))
+  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-createdAt'))
 
   const restClient = new RestClient(setCircleProcessOpen);
 
@@ -73,7 +73,7 @@ export default function ExtEndpointSummary() {
       isSortable: true
     },
     {
-      id: 'extEndpoint',
+      id: 'targetURL',
       label: 'Target URL',
       minWidth: 170,
       align: 'left',
@@ -84,13 +84,15 @@ export default function ExtEndpointSummary() {
       id: 'numberOfCompletedTasks',
       label: 'Number of completed',
       minWidth: 170,
-      align: 'left'
+      align: 'left',
+      isSortable: true
     },
     {
       id: 'percentCompleted',
       label: 'Percent completed',
       minWidth: 170,
       align: 'left',
+      isSortable: true,
       format: (value: number) => (<Gauge
         width={75}
         height={75}
@@ -102,10 +104,19 @@ export default function ExtEndpointSummary() {
       />)
     },
     {
+      id: 'numberOfResponses',
+      label: 'Number of responses',
+      minWidth: 170,
+      align: 'left',
+      isSortable: true,
+      format: (value: number) => (<Typography variant="h6">{value}</Typography>)
+    },
+    {
       id: 'createdAt',
       label: 'Created at',
       minWidth: 100,
       align: 'left',
+      isSortable: true,
       format: (value: string) => value,
     },
     {
@@ -113,6 +124,7 @@ export default function ExtEndpointSummary() {
       label: 'Elapsed time',
       minWidth: 100,
       align: 'left',
+      isSortable: true,
       format: (value: string) => value,
     },
     {
@@ -185,6 +197,9 @@ export default function ExtEndpointSummary() {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
       setOrderBy(orderBy);
+      LocalStorageService.put(pageIndexStorageKey, pageIndex)
+      LocalStorageService.put(pageSizeStorageKey, pageSize)
+      LocalStorageService.put(orderByStorageKey, orderBy)
     }
   }
 

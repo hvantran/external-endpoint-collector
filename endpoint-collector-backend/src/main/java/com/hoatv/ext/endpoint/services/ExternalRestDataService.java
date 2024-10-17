@@ -27,7 +27,6 @@ import com.hoatv.task.mgmt.services.TaskMgmtService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -36,6 +35,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -284,34 +285,22 @@ public class ExternalRestDataService {
 
     @TimingMetricMonitor
     @Transactional
-    public Page<EndpointSummaryVO> getAllExtEndpoints(String application, Pageable pageable) {
-
-        if (Objects.isNull(application)) {
-            Page<EndpointSetting> endpointSettings = endpointSettingRepository.findAll(pageable);
-            return endpointSettings.map(p -> {
-                EndpointExecutionResult byEndpointSetting = executionResultRepository.findByEndpointSetting(p);
-                String elapsedTime = Optional.ofNullable(byEndpointSetting)
-                        .map(EndpointExecutionResult::getElapsedTime)
-                        .orElse(null);
-                Integer numberOfCompletedTasks = Optional.ofNullable(byEndpointSetting)
-                        .map(EndpointExecutionResult::getNumberOfCompletedTasks)
-                        .orElse(0);
-                Integer percentCompleted = Optional.ofNullable(byEndpointSetting)
-                        .map(EndpointExecutionResult::getPercentComplete)
-                        .orElse(0);
-                return p.toEndpointSummaryVO()
-                        .elapsedTime(elapsedTime)
-                        .numberOfCompletedTasks(numberOfCompletedTasks)
-                        .percentCompleted(percentCompleted)
-                        .build();
-            });
-        }
-
-        Page<EndpointSetting> endpointConfigsByApplication = endpointSettingRepository.findEndpointConfigsByApplication(application, pageable);
-        return endpointConfigsByApplication.map(p -> {
-            EndpointExecutionResult byEndpointSetting = executionResultRepository.findByEndpointSetting(p);
-            String elapsedTime = byEndpointSetting == null ? null : byEndpointSetting.getElapsedTime();
-            return p.toEndpointSummaryVO().elapsedTime(elapsedTime).build();
+    public Page<EndpointSettingOverviewVO> getAllExtEndpoints(Pageable pageable) {
+        Page<EndpointSettingRepository.EndpointSettingOverview> endpointSettings = endpointSettingRepository.findEndpointSettingOverview(pageable);
+        return endpointSettings.map(p -> {
+            EndpointSetting endpointSetting = p.getEndpointSetting();
+            LocalDateTime createdAt = endpointSetting.getCreatedAt();
+            return EndpointSettingOverviewVO.builder()
+                    .endpointId(endpointSetting.getId())
+                    .application(p.getApplication())
+                    .taskName(p.getTaskName())
+                    .elapsedTime(p.getElapsedTime())
+                    .targetURL(p.getTargetURL())
+                    .numberOfCompletedTasks(p.getNumberOfCompletedTasks())
+                    .numberOfResponses(p.getNumberOfResponses())
+                    .createdAt(Objects.isNull(createdAt) ? "" : createdAt.format(DateTimeFormatter.ISO_DATE_TIME))
+                    .percentCompleted(p.getPercentCompleted())
+                    .build();
         });
     }
 

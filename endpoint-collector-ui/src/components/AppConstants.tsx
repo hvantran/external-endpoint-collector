@@ -37,18 +37,11 @@ export interface ExtEndpointOverview {
     endpointId: number
     application: string
     taskName: string
-    noAttemptTimes: number
-    noParallelThread: number
-    extEndpoint: string
-    extEndpointMethod: string
-    extEndpointData: string
-    successCriteria: string
+    targetURL: string
     elapsedTime: string
-    responseConsumerType: string
-    executorServiceType: string
     createdAt: string
-    fromPosition: string
-    numberOfCompletedTasks: number,
+    numberOfCompletedTasks: number
+    numberOfResponses: number
     percentCompleted: number
 }
 
@@ -176,27 +169,6 @@ export class EndpointBackendClient {
         const targetURL = `${EXT_ENDPOINT_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}&orderBy=${orderBy}`;
         await restClient.sendRequest(requestOptions, targetURL, async (response) => {
             let extEndpointPagingResult = await response.json() as PagingResult;
-            extEndpointPagingResult.elementTransformCallback = (record) => {
-                const transfromRecord: ExtEndpointOverview = {
-                    endpointId: record.endpointId,
-                    application: record.input.application,
-                    taskName: record.input.taskName,
-                    noAttemptTimes: record.input.noAttemptTimes,
-                    noParallelThread: record.input.noParallelThread,
-                    extEndpoint: record.input.requestInfo.extEndpoint,
-                    extEndpointMethod: record.input.requestInfo.method,
-                    extEndpointData: record.input.requestInfo.data,
-                    successCriteria: record.filter.successCriteria,
-                    elapsedTime: record.elapsedTime,
-                    createdAt: record.createdAt,
-                    fromPosition: record.input.dataGeneratorInfo.generatorSaltStartWith,
-                    responseConsumerType: record.output.responseConsumerType,
-                    executorServiceType: record.input.executorServiceType,
-                    numberOfCompletedTasks: record.numberOfCompletedTasks,
-                    percentCompleted: record.percentCompleted
-                }
-                return transfromRecord;
-            }
             successCallback(extEndpointPagingResult);
             return { 'message': 'Load endpoints successfully!!', key: new Date().getTime() } as SnackbarMessage;
         }, async (response: Response) => {

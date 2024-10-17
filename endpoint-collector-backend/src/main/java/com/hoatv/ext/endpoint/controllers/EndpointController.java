@@ -2,9 +2,8 @@ package com.hoatv.ext.endpoint.controllers;
 
 import com.hoatv.ext.endpoint.dtos.EndpointResponseVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
-import com.hoatv.ext.endpoint.dtos.EndpointSummaryVO;
+import com.hoatv.ext.endpoint.dtos.EndpointSettingOverviewVO;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
-import com.hoatv.ext.endpoint.models.EndpointSetting;
 import com.hoatv.ext.endpoint.services.ExternalRestDataService;
 import jakarta.validation.Valid;
 
@@ -40,15 +39,14 @@ public class EndpointController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getEndpoints(
-            @RequestParam(required = false, name = "application") String application,
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize,
-            @RequestParam(name = "orderBy", defaultValue = "application") String orderBy) {
+            @RequestParam(name = "orderBy", defaultValue = "-createdAt") String orderBy) {
         Sort.Direction direction = orderBy.startsWith("-") ? Sort.Direction.DESC : Sort.Direction.ASC;
         String sortByProperty = orderBy.replace("-", "");
         Sort defaultSorting = Sort.by(new Sort.Order(direction, sortByProperty));
-        Page<EndpointSummaryVO> allExtEndpoints =
-                externalRestDataService.getAllExtEndpoints(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
+        Page<EndpointSettingOverviewVO> allExtEndpoints =
+                externalRestDataService.getAllExtEndpoints(PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(allExtEndpoints);
     }
 

@@ -1,15 +1,12 @@
 package com.hoatv.ext.endpoint.models;
 
 import com.hoatv.ext.endpoint.dtos.*;
-import com.hoatv.ext.endpoint.utils.SaltGeneratorUtils;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -74,12 +71,12 @@ public class EndpointSetting {
     @Column
     private LocalDateTime createdAt;
 
-    @OneToOne
     @ToString.Exclude
+    @OneToOne(mappedBy = "endpointSetting", cascade = CascadeType.ALL)
     private EndpointExecutionResult executionResult;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "endpointSetting")
     @ToString.Exclude
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "endpointSetting")
     private Set<EndpointResponse> resultSet = new HashSet<>();
 
     @PrePersist
@@ -122,38 +119,6 @@ public class EndpointSetting {
                 .filter(filter)
                 .output(outputVO)
                 .build();
-    }
-
-    public EndpointSummaryVO.EndpointSummaryVOBuilder toEndpointSummaryVO() {
-
-        return EndpointSummaryVO.builder()
-                .endpointId(id)
-                .input(InputVO.builder()
-                        .application(application)
-                        .taskName(taskName)
-                        .noAttemptTimes(noAttemptTimes)
-                        .noParallelThread(noParallelThread)
-                        .columnMetadata(columnMetadata)
-                        .dataGeneratorInfo(DataGeneratorInfoVO.builder()
-                                .generatorMethodName(generatorMethodName)
-                                .generatorSaltLength(generatorSaltLength)
-                                .generatorStrategy(generatorStrategy)
-                                .generatorSaltStartWith(generatorSaltStartWith)
-                                .build())
-                        .requestInfo(RequestInfoVO.builder()
-                                .data(data)
-                                .extEndpoint(extEndpoint)
-                                .method(method)
-                                .build())
-                        .executorServiceType(executorServiceType)
-                        .build())
-                .output( OutputVO.builder()
-                        .responseConsumerType(responseConsumerType)
-                        .build())
-                .createdAt(Objects.isNull(createdAt) ? "" : createdAt.format(DateTimeFormatter.ISO_DATE_TIME))
-                .filter(FilterVO.builder()
-                        .successCriteria(successCriteria)
-                        .build());
     }
 
     public static EndpointSetting fromEndpointConfigVO(EndpointSettingVO endpointSettingVO) {
