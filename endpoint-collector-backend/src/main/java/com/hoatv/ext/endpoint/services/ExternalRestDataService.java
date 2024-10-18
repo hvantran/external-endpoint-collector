@@ -32,7 +32,6 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -125,18 +124,26 @@ public class ExternalRestDataService {
             EndpointSetting endpointSetting = executionResult.getEndpointSetting();
             Long endpointSettingId = endpointSetting.getId();
             String columnMetadata = endpointSetting.getColumnMetadata();
-            CheckedSupplier<MetadataVO> columnMetadataVOSup = () -> objectMapper.readValue(columnMetadata, MetadataVO.class);
-            MetadataVO metadataVO = columnMetadataVOSup.get();
+            MetadataVO metadataVO = getMetadataVO(columnMetadata);
             String generatorSaltStartWith = endpointSetting.getGeneratorSaltStartWith();
-            String lastRandomValue = metadataVO.getColumnMetadata().stream()
-                    .filter(p -> "random".equals(p.getFieldPath()))
-                    .findFirst().map(columnMetadataVO -> {
-                        String mappingColumnName = columnMetadataVO.getMappingColumnName();
-                        return customEndpointResponseRepository.findMaxValueByColumn(mappingColumnName, endpointSettingId);
-                    }).orElse(generatorSaltStartWith);
+            String lastRandomValue = getLastRandomValue(metadataVO, endpointSettingId, generatorSaltStartWith);
             int numberOfCompletedTasks = getNumberOfCompletedTasks(lastRandomValue, generatorSaltStartWith);
             collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult, numberOfCompletedTasks);
         }));
+    }
+
+    private MetadataVO getMetadataVO(String columnMetadata) {
+        CheckedSupplier<MetadataVO> columnMetadataVOSup = () -> objectMapper.readValue(columnMetadata, MetadataVO.class);
+        return columnMetadataVOSup.get();
+    }
+
+    private String getLastRandomValue(MetadataVO metadataVO, Long endpointSettingId, String generatorSaltStartWith) {
+        return metadataVO.getColumnMetadata().stream()
+                .filter(p -> "random".equals(p.getFieldPath()))
+                .findFirst().map(columnMetadataVO -> {
+                    String mappingColumnName = columnMetadataVO.getMappingColumnName();
+                    return customEndpointResponseRepository.findMaxValueByColumn(mappingColumnName, endpointSettingId);
+                }).orElse(generatorSaltStartWith);
     }
 
     private int getNumberOfCompletedTasks(
@@ -195,8 +202,7 @@ public class ExternalRestDataService {
 
         // Metadata
         String columnMetadata = endpointSetting.getColumnMetadata();
-        CheckedSupplier<MetadataVO> columnMetadataVOSup = () -> objectMapper.readValue(columnMetadata, MetadataVO.class);
-        MetadataVO metadataVO = columnMetadataVOSup.get();
+        MetadataVO metadataVO = getMetadataVO(columnMetadata);
 
         // Job configuration
         String application = endpointSetting.getApplication();
@@ -277,20 +283,6 @@ public class ExternalRestDataService {
         return responses.map(EndpointResponse::toEndpointResponseVO);
     }
 
-
-    @TimingMetricMonitor
-    public Page<EndpointResponseVO> getEndpointResponses(String application, Pageable pageable) {
-
-        Page<EndpointSetting> endpointSettings = endpointSettingRepository.findEndpointConfigsByApplication(
-                application, PageRequest.of(0, 10));
-        if (endpointSettings.isEmpty()) {
-            return Page.empty();
-        }
-        Page<EndpointResponse> responses = endpointResponseRepository.findByEndpointSettingIn(
-                endpointSettings.stream().toList(), pageable);
-        return responses.map(EndpointResponse::toEndpointResponseVO);
-    }
-
     @TimingMetricMonitor
     @Transactional
     public Page<EndpointSettingOverviewVO> getAllExtEndpoints(Pageable pageable) {
@@ -341,33 +333,34 @@ public class ExternalRestDataService {
         EndpointSetting endpointSetting = endpointSettingsOp
                 .orElseThrow(() -> new EntityNotFoundException(ENDPOINT_ID_NOT_FOUND.formatted(endpointId)));
         EndpointExecutionResult executionResult = executionResultRepository.findByEndpointSetting(endpointSetting);
-        
-        if (executionResult.getState() == nextExecutionState) {
-            LOGGER.warn("Endpoint is already in state: {}. No need to do any action", nextExecutionState);
-            return;
-        }
+        ObjectUtils.checkThenThrow(executionResult.getState() == ExecutionState.END, "Endpoint is ended");
+        ObjectUtils.checkThenThrow(executionResult.getState() == nextExecutionState, "Endpoint is already in state");
 
         executionResult.setState(nextExecutionState);
         String application = endpointSetting.getApplication();
         String taskName = endpointSetting.getTaskName();
         if (nextExecutionState == ExecutionState.PAUSED) {
-            pauseEndpoint(application, taskName, executionResult);
-            LOGGER.info("Endpoint application: {} - {} has been paused successfully", application, taskName);
+            TaskMgmtService taskMgmtService = activeEndpointTaskMap.get(taskName);
+            TaskFactory.INSTANCE.destroy("TaskMgmtService", taskMgmtService);
+            TaskFactory.INSTANCE.destroy(application);
+            HttpClientFactory.INSTANCE.destroy(taskName);
+            executionResult.setState(ExecutionState.PAUSED);
+            executionResultRepository.save(executionResult);
+            try (var ignored = activeEndpointTaskMap.remove(taskName)) {
+                LOGGER.info("Endpoint application: {} - {} has been paused successfully", application, taskName);
+            }
+            return;
+        }
+        if (nextExecutionState == ExecutionState.ACTIVE) {
+            EndpointSettingVO endpointSettingVO = endpointSetting.toEndpointSettingVO();
+            MetadataVO metadataVO = getMetadataVO(endpointSetting.getColumnMetadata());
+            String generatorSaltStartWith = endpointSetting.getGeneratorSaltStartWith();
+            String lastRandomValue = getLastRandomValue(metadataVO, endpointSetting.getId(), generatorSaltStartWith);
+            int numberOfCompletedTasks = getNumberOfCompletedTasks(lastRandomValue, generatorSaltStartWith);
+            collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult, numberOfCompletedTasks);
+            LOGGER.info("Endpoint application: {} - {} has been resume successfully", application, taskName);
             return;
         }
         throw new UnsupportedOperationException("Unsupported operation for " + patchEndpointSettingVO);
-    }
-
-    private void pauseEndpoint(
-            String application,
-            String taskName,
-            EndpointExecutionResult endpointExecutionResult) {
-        TaskMgmtService taskMgmtService = activeEndpointTaskMap.get(taskName);
-        TaskFactory.INSTANCE.destroy("TaskMgmtService", taskMgmtService);
-        TaskFactory.INSTANCE.destroy(application);
-        HttpClientFactory.INSTANCE.destroy(taskName);
-        endpointExecutionResult.setState(ExecutionState.PAUSED);
-        executionResultRepository.save(endpointExecutionResult);
-        activeEndpointTaskMap.remove(taskName);
     }
 }

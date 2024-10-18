@@ -28,7 +28,6 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 import TextTruncate from '../common/TextTruncate';
 import PageEntityRender from '../renders/PageEntityRender';
-import { Slide, toast } from 'react-toastify';
 
 
 const pageIndexStorageKey = "endpoint-collector-summary-table-page-index"
@@ -38,14 +37,14 @@ const orderByStorageKey = "endpoint-collector-summary-table-order"
 export default function ExtEndpointSummary() {
   const navigate = useNavigate();
   const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const [_, setInternalReload] = React.useState(false);
+  const [innerKey, setInnerKey] = React.useState(0);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-createdAt'))
 
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
@@ -151,17 +150,8 @@ export default function ExtEndpointSummary() {
           actionLabel: "Resume",
           actionName: "resumeEndpoint",
           onClick: (row: ExtEndpointOverview) => () => {
-            toast.error("Resume is not supported yet", {
-              position: "bottom-center",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "colored",
-              transition: Slide,
-          })
+            EndpointBackendClient.update(row.endpointId, {state: 'ACTIVE'}, restClient);
+            setInnerKey((previous: number) => previous + 1)
           }
         },
         {
@@ -170,8 +160,8 @@ export default function ExtEndpointSummary() {
           actionLabel: "Pause",
           actionName: "pauseEndpoint",
           onClick: (row: ExtEndpointOverview) => () => {
-            EndpointBackendClient.pause(row.endpointId, {state: 'PAUSED'}, restClient);
-            setInternalReload((previous: boolean) => !previous)
+            EndpointBackendClient.update(row.endpointId, {state: 'PAUSED'}, restClient);
+            setInnerKey((previous: number) => previous + 1)
           }
         },
         {
@@ -213,7 +203,7 @@ export default function ExtEndpointSummary() {
       restClient,
       (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
     );
-  }, [pageIndex, pageSize, orderBy])
+  }, [pageIndex, pageSize, orderBy, restClient])
 
   const endpoints: Array<SpeedDialActionMetadata> = [
     {
@@ -274,7 +264,7 @@ export default function ExtEndpointSummary() {
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} key={innerKey}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
     </Stack>

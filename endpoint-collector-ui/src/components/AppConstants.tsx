@@ -134,10 +134,7 @@ export interface InputMetadata {
 }
 
 export class EndpointBackendClient {
-    static resume(endpointId: number, restClient: RestClient) {
-      throw new Error('Method not implemented.')
-    }
-    static pause = async(endpointId: number, endpointMetadata: PatchEndpointMetadata, restClient: RestClient) => {
+    static update = async(endpointId: number, endpointMetadata: PatchEndpointMetadata, restClient: RestClient) => {
         const requestOptions = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -146,9 +143,7 @@ export class EndpointBackendClient {
   
         const targetURL = `${EXT_ENDPOINT_BACKEND_URL}/${endpointId}`;
         await restClient.sendRequest(requestOptions, targetURL, async () => {
-            return { 'message': 'Endpoint is paused', key: new Date().getTime() } as SnackbarMessage;
-        }, async (response: Response) => {
-            return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
+            return { 'message': `Endpoint is ${endpointMetadata.state}`, key: new Date().getTime() } as SnackbarMessage;
         });
     }
 
@@ -163,8 +158,6 @@ export class EndpointBackendClient {
         await restClient.sendRequest(requestOptions, targetURL, async () => {
             let message = `Endpoint collector ${endpointMetadata.input.application} is created`;
             return { 'message': message, key: new Date().getTime() } as SnackbarMessage;
-        }, async (response: Response) => {
-            return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
         });
     }
 
@@ -184,9 +177,6 @@ export class EndpointBackendClient {
         await restClient.sendRequest(requestOptions, targetURL, () => {
             successCallback();
             return undefined;
-        }, async (response: Response) => {
-            let responseJSON = await response.json();
-            return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
         });
     }
 
@@ -208,9 +198,6 @@ export class EndpointBackendClient {
             let extEndpointPagingResult = await response.json() as PagingResult;
             successCallback(extEndpointPagingResult);
             return { 'message': 'Load endpoints successfully!!', key: new Date().getTime() } as SnackbarMessage;
-        }, async (response: Response) => {
-            let responseJSON = await response.json();
-            return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
         });
     }
 
@@ -250,9 +237,6 @@ export class EndpointBackendClient {
             } 
             successCallback(endpointDetailMetadata);
             return { 'message': 'Load endpoint successfully!!', key: new Date().getTime() } as SnackbarMessage;
-        }, async (response: Response) => {
-            let responseJSON = await response.json();
-            return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
         });
     }
 
@@ -276,9 +260,6 @@ export class EndpointBackendClient {
             let extEndpointPagingResult = await response.json() as PagingResult;
             successCallback(extEndpointPagingResult)
             return undefined;
-        }, async (response: Response) => {
-            let responseJSON = await response.json();
-            return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
         });
     }
 }

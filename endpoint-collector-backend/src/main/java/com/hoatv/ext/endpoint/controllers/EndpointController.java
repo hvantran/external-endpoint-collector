@@ -60,7 +60,7 @@ public class EndpointController {
     }
 
     @DeleteMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getEndpointResponses(
+    public ResponseEntity<Object> deleteEndpointSetting(
             @PathVariable("endpointId") Long endpointId) {
         boolean isDeleted = externalRestDataService.deleteEndpoint(endpointId);
         return ResponseEntity.ok(String.format("{\"message\": %s}", isDeleted));
