@@ -32,25 +32,25 @@ public class SaltGeneratorUtils {
     public static String getSaltString(Integer length) {
 
         StringBuilder salt = new StringBuilder();
-        return getSalt(length, salt, SALT_CHARS);
+        return getRandomSalt(length, salt, SALT_CHARS);
     }
 
     public static String getSaltString(Integer length, String startWith) {
 
         StringBuilder salt = new StringBuilder(startWith);
-        return getSalt(length, salt, SALT_CHARS);
+        return getRandomSalt(length, salt, SALT_CHARS);
     }
 
     public static String getSaltNums(Integer length) {
 
         StringBuilder salt = new StringBuilder();
-        return getSalt(length, salt, SALT_NUMS);
+        return getRandomSalt(length, salt, SALT_NUMS);
     }
 
     public static String getSaltNums(Integer length, String startWith) {
 
         StringBuilder salt = new StringBuilder(startWith);
-        return getSalt(length, salt, SALT_NUMS);
+        return getRandomSalt(length, salt, SALT_NUMS);
     }
 
     public static String getSequenceNums(int length, long startWith, int increases) {
@@ -58,7 +58,7 @@ public class SaltGeneratorUtils {
         return StringUtils.leftPad(String.valueOf(startWith + increases), length, "0");
     }
 
-    private static String getSalt(int length, StringBuilder salt, String saltNums) {
+    private static String getRandomSalt(int length, StringBuilder salt, String saltNums) {
 
         while (salt.length() < length) {
             int index = rnd.nextInt(saltNums.length());

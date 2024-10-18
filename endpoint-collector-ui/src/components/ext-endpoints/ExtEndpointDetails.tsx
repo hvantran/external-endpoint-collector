@@ -421,7 +421,7 @@ export default function ExtEndpointDetails() {
     pageSize,
     orderBy,
     component: 'div',
-    rowsPerPageOptions: [5, 10, 20],
+    rowsPerPageOptions: [10, 50, 100, 500],
     onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
