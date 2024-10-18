@@ -28,6 +28,7 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 import TextTruncate from '../common/TextTruncate';
 import PageEntityRender from '../renders/PageEntityRender';
+import { Slide, toast } from 'react-toastify';
 
 
 const pageIndexStorageKey = "endpoint-collector-summary-table-page-index"
@@ -150,8 +151,17 @@ export default function ExtEndpointSummary() {
           actionLabel: "Resume",
           actionName: "resumeEndpoint",
           onClick: (row: ExtEndpointOverview) => () => {
-            EndpointBackendClient.resume(row.endpointId, restClient);
-            setInternalReload((previous: boolean) => !previous)
+            toast.error("Resume is not supported yet", {
+              position: "bottom-center",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              transition: Slide,
+          })
           }
         },
         {
