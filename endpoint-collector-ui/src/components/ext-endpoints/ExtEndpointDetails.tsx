@@ -2,6 +2,7 @@
 import PestControlIcon from '@mui/icons-material/PestControl';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
@@ -42,7 +43,7 @@ export default function ExtEndpointDetails() {
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-column1'))
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const endpointSettingId: string | undefined = targetAction.application;
   if (!endpointSettingId) {
@@ -402,7 +403,7 @@ export default function ExtEndpointDetails() {
           })
         })
       });
-  }, [endpointSettingId]);
+  }, [endpointSettingId, restClient]);
 
   React.useEffect(() => {
     EndpointBackendClient.loadExternalEndpointResponseAsync(
@@ -413,7 +414,7 @@ export default function ExtEndpointDetails() {
       restClient,
       (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
     )
-  }, [endpointSettingId, pageIndex, pageSize, orderBy])
+  }, [endpointSettingId, pageIndex, pageSize, orderBy, restClient])
 
 
   let pagingOptions: PagingOptionMetadata = {
@@ -457,6 +458,14 @@ export default function ExtEndpointDetails() {
           </Link>,
         actionLabel: "Troubleshoot in Kibana",
         actionName: "troubleshootAction"
+      },
+      {
+          actionIcon: <ContentCopyIcon />,
+          actionLabel: "Clone",
+          actionName: "cloneJob",
+          onClick: () => {
+              navigate("/endpoints/new", { state: { copyId: endpointSettingId } })
+          }
       },
       {
         actionIcon: <RefreshIcon />,

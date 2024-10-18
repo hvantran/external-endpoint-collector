@@ -44,7 +44,7 @@ export default function ExtEndpointSummary() {
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-createdAt'))
 
-  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>

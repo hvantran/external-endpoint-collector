@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 import LinkBreadcrumd from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import { EndpointBackendClient, ExtEndpointMetadata, ROOT_BREADCRUMB, SAMPLE_ENDPOINT_DATA } from '../AppConstants';
+import { EndpointBackendClient, EndpointDetail, ExtEndpointMetadata, ROOT_BREADCRUMB, SAMPLE_ENDPOINT_DATA } from '../AppConstants';
 import {
   PageEntityMetadata,
   PropType,
@@ -17,17 +17,20 @@ import ProcessTracking from '../common/ProcessTracking';
 
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import TimelapseIcon from '@mui/icons-material/Timelapse';
+import { useLocation } from 'react-router-dom';
 import PageEntityRender from '../renders/PageEntityRender';
 
 
 export default function ActionCreation() {
 
   let initialStepsV3: Array<StepMetadata> = []
+  const location = useLocation();
+  const copyId = location.state?.copyId || "";
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
-  const externalEndpointProperties: PropertyMetadata[] = [
+  const properties: PropertyMetadata[] = [
     {
       propName: 'application',
       propLabel: 'Application',
@@ -319,7 +322,7 @@ export default function ActionCreation() {
       name: "extEndpointCreation",
       label: 'Endpoint metadata',
       description: 'This step is used to define an external endpoint information',
-      properties: externalEndpointProperties
+      properties: properties
     },
     {
       name: "review",
@@ -335,7 +338,18 @@ export default function ActionCreation() {
 
   React.useEffect(() => {
     setStepMetadatas(initialStepMetadatas);
-  }, [])
+    if (copyId) {
+      EndpointBackendClient.loadExternalEndpointSettingAsync(
+        parseInt(copyId),
+        restClient,
+        (endpointMetadata: EndpointDetail) => {
+          endpointMetadata.application = `${endpointMetadata.application}-Copy`
+          Object.keys(endpointMetadata).forEach((propertyName: string) => {
+            setStepMetadatas(onchangeStepDefault(propertyName, endpointMetadata[propertyName as keyof EndpointDetail]));
+          })
+        });
+    }
+  }, [copyId, restClient])
 
   const getExtEndpointMetadataFromStepper = (currentStepMetadata: Array<StepMetadata>) => {
     const endpointMetadataStepIndex = 0;
