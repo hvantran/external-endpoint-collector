@@ -1,10 +1,10 @@
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PauseCircleOutline from '@mui/icons-material/PauseCircleOutline';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import PauseCircleOutline from '@mui/icons-material/PauseCircleOutline';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
@@ -13,7 +13,7 @@ import { green, red } from '@mui/material/colors';
 import { Gauge } from '@mui/x-charts';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EndpointBackendClient, ExtEndpointOverview, PatchEndpointMetadata, ROOT_BREADCRUMB } from '../AppConstants';
+import { EndpointBackendClient, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
 import {
   ColumnMetadata,
   LocalStorageService,
@@ -37,7 +37,7 @@ const orderByStorageKey = "endpoint-collector-summary-table-order"
 export default function ExtEndpointSummary() {
   const navigate = useNavigate();
   const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const [internalReload, setInternalReload] = React.useState(false)
+  const [_, setInternalReload] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
@@ -146,7 +146,7 @@ export default function ExtEndpointSummary() {
       actions: [
         {
           actionIcon: <PlayCircleIcon/>,
-          visible: (row: any) => row.status === "PAUSED",
+          visible: (row: any) => row.state === "PAUSED",
           actionLabel: "Resume",
           actionName: "resumeEndpoint",
           onClick: (row: ExtEndpointOverview) => () => {

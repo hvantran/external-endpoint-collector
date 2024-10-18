@@ -413,7 +413,7 @@ export default function ExtEndpointDetails() {
       restClient,
       (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
     )
-  }, [pageIndex, pageSize, orderBy])
+  }, [endpointSettingId, pageIndex, pageSize, orderBy])
 
 
   let pagingOptions: PagingOptionMetadata = {
