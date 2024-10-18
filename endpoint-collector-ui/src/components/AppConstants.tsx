@@ -43,6 +43,7 @@ export interface ExtEndpointOverview {
     numberOfCompletedTasks: number
     numberOfResponses: number
     percentCompleted: number
+    state: string
 }
 
 export interface StoredColumn {
@@ -87,6 +88,9 @@ export interface EndpointDetail {
       extEndpointData: string | undefined
       columnMetadata: string
 }
+export interface PatchEndpointMetadata {
+    state: 'ACTIVE' | 'PAUSED'
+}
 
 export interface ExtEndpointMetadata {
     input: InputMetadata
@@ -130,6 +134,39 @@ export interface InputMetadata {
 }
 
 export class EndpointBackendClient {
+    static resume(endpointId: number, restClient: RestClient) {
+      throw new Error('Method not implemented.')
+    }
+    static pause = async(endpointId: number, endpointMetadata: PatchEndpointMetadata, restClient: RestClient) => {
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(endpointMetadata)
+        };
+  
+        const targetURL = `${EXT_ENDPOINT_BACKEND_URL}/${endpointId}`;
+        await restClient.sendRequest(requestOptions, targetURL, async () => {
+            return { 'message': 'Endpoint is paused', key: new Date().getTime() } as SnackbarMessage;
+        }, async (response: Response) => {
+            return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
+        });
+    }
+
+    static create = async (endpointMetadata: ExtEndpointMetadata, restClient: RestClient) => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(endpointMetadata)
+        };
+  
+        const targetURL = `${EXT_ENDPOINT_BACKEND_URL}`;
+        await restClient.sendRequest(requestOptions, targetURL, async () => {
+            let message = `Endpoint collector ${endpointMetadata.input.application} is created`;
+            return { 'message': message, key: new Date().getTime() } as SnackbarMessage;
+        }, async (response: Response) => {
+            return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
+        });
+    }
 
     static deleteEndpointCollector = async (
         endpointId: number,

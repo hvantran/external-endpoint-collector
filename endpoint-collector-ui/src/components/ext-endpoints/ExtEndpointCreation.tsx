@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 import LinkBreadcrumd from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import { EXT_ENDPOINT_BACKEND_URL, ExtEndpointMetadata, ROOT_BREADCRUMB, SAMPLE_ENDPOINT_DATA } from '../AppConstants';
+import { EndpointBackendClient, EXT_ENDPOINT_BACKEND_URL, ExtEndpointMetadata, ROOT_BREADCRUMB, SAMPLE_ENDPOINT_DATA } from '../AppConstants';
 import {
   PageEntityMetadata,
   PropType,
@@ -329,20 +329,7 @@ export default function ActionCreation() {
       properties: [],
       onFinishStepClick: async (currentStepMetadata: Array<StepMetadata>) => {
         let endpointMetadata: ExtEndpointMetadata = getExtEndpointMetadataFromStepper(currentStepMetadata);
-
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(endpointMetadata)
-        };
-
-        const targetURL = `${EXT_ENDPOINT_BACKEND_URL}`;
-        await restClient.sendRequest(requestOptions, targetURL, async () => {
-          let message = `Endpoint collector ${endpointMetadata.input.application} is created`;
-          return { 'message': message, key: new Date().getTime() } as SnackbarMessage;
-        }, async (response: Response) => {
-          return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
-        });
+        EndpointBackendClient.create(endpointMetadata, restClient);
       }
     }
   ]

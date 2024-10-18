@@ -1,6 +1,8 @@
 package com.hoatv.ext.endpoint.repositories;
 
+import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
+import com.hoatv.ext.endpoint.models.ExecutionState;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ public interface EndpointSettingRepository extends JpaRepository<EndpointSetting
                         es.extEndpoint AS targetURL,
                         es.taskName AS taskName,
                         es.application AS application,
+                        eer.state AS state,
                         COALESCE(eer.percentComplete, 0) AS percentCompleted, 
                         COALESCE(eer.numberOfTasks, 0) AS numberOfCompletedTasks,
                         eer.elapsedTime AS elapsedTime,
@@ -34,7 +37,13 @@ public interface EndpointSettingRepository extends JpaRepository<EndpointSetting
                         LEFT JOIN 
                             es.resultSet AS er
                         GROUP BY 
-                            es, es.extEndpoint, es.taskName, es.application, eer.percentComplete, eer.elapsedTime, eer.numberOfTasks
+                            es, es.extEndpoint, 
+                            es.taskName, 
+                            es.application, 
+                            eer.state, 
+                            eer.percentComplete, 
+                            eer.elapsedTime, 
+                            eer.numberOfTasks
                     """,
             countQuery = "SELECT COUNT(DISTINCT es.id) FROM EndpointSetting es"
     )
@@ -50,6 +59,8 @@ public interface EndpointSettingRepository extends JpaRepository<EndpointSetting
         String getTargetURL();
 
         String getElapsedTime();
+
+        ExecutionState getState();
 
         Integer getPercentCompleted();
 

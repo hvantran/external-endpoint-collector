@@ -2,6 +2,7 @@ package com.hoatv.ext.endpoint.repositories;
 
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
+import com.hoatv.ext.endpoint.models.ExecutionState;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,5 +19,5 @@ public interface ExecutionResultRepository extends JpaRepository<EndpointExecuti
     EndpointExecutionResult findByEndpointSetting(EndpointSetting endpointSetting);
     
     @EntityGraph(attributePaths = "endpointSetting")
-    List<EndpointExecutionResult> findByPercentCompleteLessThan(int percent);
+    List<EndpointExecutionResult> findByPercentCompleteLessThanAndState(int percent, ExecutionState state);
 }

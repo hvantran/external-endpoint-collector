@@ -3,6 +3,7 @@ package com.hoatv.ext.endpoint.controllers;
 import com.hoatv.ext.endpoint.dtos.EndpointResponseVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingVO;
 import com.hoatv.ext.endpoint.dtos.EndpointSettingOverviewVO;
+import com.hoatv.ext.endpoint.dtos.PatchEndpointSettingVO;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
 import com.hoatv.ext.endpoint.services.ExternalRestDataService;
 import jakarta.validation.Valid;
@@ -31,12 +32,6 @@ public class EndpointController {
         return ResponseEntity.ok(String.format("{\"endpointId\": %s}", extEndpoint));
     }
 
-    @GetMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getEndpointSetting(@PathVariable("endpointId") Long endpointId) {
-        EndpointSettingVO extEndpoint = externalRestDataService.getEndpointSetting(endpointId);
-        return ResponseEntity.ok(extEndpoint);
-    }
-
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getEndpoints(
             @RequestParam(name = "pageIndex") int pageIndex,
@@ -48,6 +43,20 @@ public class EndpointController {
         Page<EndpointSettingOverviewVO> allExtEndpoints =
                 externalRestDataService.getAllExtEndpoints(PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(allExtEndpoints);
+    }
+
+    @GetMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getEndpointSetting(@PathVariable("endpointId") Long endpointId) {
+        EndpointSettingVO extEndpoint = externalRestDataService.getEndpointSetting(endpointId);
+        return ResponseEntity.ok(extEndpoint);
+    }
+
+    @PutMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> updateEndpointSetting(
+            @PathVariable("endpointId") Long endpointId,
+            @Valid @RequestBody PatchEndpointSettingVO patchEndpointSettingVO) {
+        externalRestDataService.updateEndpointSetting(endpointId, patchEndpointSettingVO);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(value = "/{endpointId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,17 +76,6 @@ public class EndpointController {
         Sort defaultSorting = Sort.by(new Sort.Order(direction, sortByProperty));
         Page<EndpointResponseVO> endpointResponses =
                 externalRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize, defaultSorting));
-        return ResponseEntity.ok(endpointResponses);
-    }
-
-    @GetMapping(value = "/{application}/responses-by-app-name", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getEndpointResponses(
-            @PathVariable("application") String application,
-            @RequestParam(name = "pageIndex") int pageIndex,
-            @RequestParam(name = "pageSize") int pageSize) {
-        Sort defaultSorting = Sort.by(Sort.Order.asc(EndpointResponse.Fields.column1));
-        Page<EndpointResponseVO> endpointResponses =
-                externalRestDataService.getEndpointResponses(application, PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(endpointResponses);
     }
 }

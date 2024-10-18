@@ -3,6 +3,8 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import PauseCircleOutline from '@mui/icons-material/PauseCircleOutline';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
@@ -11,7 +13,7 @@ import { green, red } from '@mui/material/colors';
 import { Gauge } from '@mui/x-charts';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EndpointBackendClient, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
+import { EndpointBackendClient, ExtEndpointOverview, PatchEndpointMetadata, ROOT_BREADCRUMB } from '../AppConstants';
 import {
   ColumnMetadata,
   LocalStorageService,
@@ -35,6 +37,7 @@ const orderByStorageKey = "endpoint-collector-summary-table-order"
 export default function ExtEndpointSummary() {
   const navigate = useNavigate();
   const [processTracking, setCircleProcessOpen] = React.useState(false);
+  const [internalReload, setInternalReload] = React.useState(false)
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
@@ -69,28 +72,44 @@ export default function ExtEndpointSummary() {
     { 
       id: 'taskName', 
       label: 'Task', 
-      minWidth: 100 ,
+      minWidth: 50 ,
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />),
       isSortable: true
     },
     {
       id: 'targetURL',
       label: 'Target URL',
-      minWidth: 170,
+      minWidth: 100,
       align: 'left',
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />),
+      format: (value: string) => (<TextTruncate text={value} maxTextLength={20} />),
+      isSortable: true
+    },
+    {
+      id: 'state',
+      label: 'State',
+      minWidth: 20,
+      align: 'left',
       isSortable: true
     },
     {
       id: 'numberOfCompletedTasks',
-      label: 'Number of completed',
-      minWidth: 170,
+      label: 'No tasks',
+      minWidth: 100,
       align: 'left',
       isSortable: true
     },
     {
+      id: 'numberOfResponses',
+      label: 'No responses',
+      minWidth: 100,
+      align: 'left',
+      isSortable: true,
+      format: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    },
+    {
       id: 'percentCompleted',
-      label: 'Percent completed',
-      minWidth: 170,
+      label: 'Percent',
+      minWidth: 100,
       align: 'left',
       isSortable: true,
       format: (value: number) => (<Gauge
@@ -104,14 +123,6 @@ export default function ExtEndpointSummary() {
       />)
     },
     {
-      id: 'numberOfResponses',
-      label: 'Number of responses',
-      minWidth: 170,
-      align: 'left',
-      isSortable: true,
-      format: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    },
-    {
       id: 'createdAt',
       label: 'Created at',
       minWidth: 100,
@@ -122,7 +133,7 @@ export default function ExtEndpointSummary() {
     {
       id: 'elapsedTime',
       label: 'Elapsed time',
-      minWidth: 100,
+      minWidth: 50,
       align: 'left',
       isSortable: true,
       format: (value: string) => value,
@@ -134,11 +145,23 @@ export default function ExtEndpointSummary() {
       align: 'right',
       actions: [
         {
-          actionIcon: <ReadMoreIcon />,
-          actionLabel: "Action details",
-          actionName: "gotoActionDetail",
-          onClick: (row: ExtEndpointOverview) => {
-            return () => navigate(`/endpoints/${row.endpointId}`)
+          actionIcon: <PlayCircleIcon/>,
+          visible: (row: any) => row.status === "PAUSED",
+          actionLabel: "Resume",
+          actionName: "resumeEndpoint",
+          onClick: (row: ExtEndpointOverview) => () => {
+            EndpointBackendClient.resume(row.endpointId, restClient);
+            setInternalReload((previous: boolean) => !previous)
+          }
+        },
+        {
+          actionIcon: <PauseCircleOutline/>,
+          visible: (row: any) => row.state === "ACTIVE",
+          actionLabel: "Pause",
+          actionName: "pauseEndpoint",
+          onClick: (row: ExtEndpointOverview) => () => {
+            EndpointBackendClient.pause(row.endpointId, {state: 'PAUSED'}, restClient);
+            setInternalReload((previous: boolean) => !previous)
           }
         },
         {
@@ -158,6 +181,14 @@ export default function ExtEndpointSummary() {
                 );
               })
             }
+          }
+        },
+        {
+          actionIcon: <ReadMoreIcon />,
+          actionLabel: "Action details",
+          actionName: "gotoActionDetail",
+          onClick: (row: ExtEndpointOverview) => {
+            return () => navigate(`/endpoints/${row.endpointId}`)
           }
         }
       ]

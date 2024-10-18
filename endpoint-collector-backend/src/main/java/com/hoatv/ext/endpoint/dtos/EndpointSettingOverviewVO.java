@@ -1,6 +1,8 @@
 package com.hoatv.ext.endpoint.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
+import com.hoatv.ext.endpoint.models.ExecutionState;
 import lombok.*;
 
 @Getter
@@ -29,5 +31,7 @@ public class EndpointSettingOverviewVO {
     private Integer numberOfResponses;
 
     private Integer percentCompleted;
+    
+    private ExecutionState state;
 }
 

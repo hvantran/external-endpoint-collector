@@ -32,6 +32,10 @@ public class EndpointExecutionResult {
     private LocalDateTime startedAt;
 
     @Column
+    @Enumerated(EnumType.STRING)
+    private ExecutionState state;
+
+    @Column
     private LocalDateTime endedAt;
 
     @Column
@@ -48,20 +52,21 @@ public class EndpointExecutionResult {
 
     @PrePersist
     public void prePersist() {
-
-        startedAt = LocalDateTime.now();
+        state = ExecutionState.ACTIVE;
         percentComplete = 0;
         numberOfCompletedTasks = 0;
+        startedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-
+        long elapsedTimeMillis = ChronoUnit.MILLIS.between(startedAt, LocalDateTime.now());
+        elapsedTime = DurationFormatUtils.formatDuration(elapsedTimeMillis, "HH:mm:ss.S");
         if (percentComplete == 100) {
             endedAt = LocalDateTime.now();
-            long elapsedTimeMillis = ChronoUnit.MILLIS.between(startedAt, endedAt);
-            elapsedTime = DurationFormatUtils.formatDuration(elapsedTimeMillis, "HH:mm:ss.S");
+            state = ExecutionState.END;
         }
     }
+
 }
 

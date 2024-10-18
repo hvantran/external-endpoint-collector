@@ -7,12 +7,14 @@ import com.hoatv.ext.endpoint.dtos.*;
 import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointResponse;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
+import com.hoatv.ext.endpoint.models.ExecutionState;
 import com.hoatv.ext.endpoint.repositories.CustomEndpointResponseRepository;
 import com.hoatv.ext.endpoint.repositories.EndpointResponseRepository;
 import com.hoatv.ext.endpoint.repositories.EndpointSettingRepository;
 import com.hoatv.ext.endpoint.repositories.ExecutionResultRepository;
 import com.hoatv.fwk.common.services.CheckedFunction;
 import com.hoatv.fwk.common.services.CheckedSupplier;
+import com.hoatv.fwk.common.services.HttpClientFactory;
 import com.hoatv.fwk.common.services.HttpClientService.HttpMethod;
 import com.hoatv.fwk.common.ultilities.ObjectUtils;
 import com.hoatv.fwk.common.ultilities.Pair;
@@ -42,6 +44,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -56,6 +59,7 @@ import static com.hoatv.fwk.common.constants.MetricProviders.OTHER_APPLICATION;
 public class ExternalRestDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalRestDataService.class);
+    public static final String ENDPOINT_ID_NOT_FOUND = "Endpoint ID %s is not found";
 
     private final EndpointSettingRepository endpointSettingRepository;
 
@@ -70,6 +74,8 @@ public class ExternalRestDataService {
     private final CustomEndpointResponseRepository customEndpointResponseRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final Map<String, TaskMgmtService> activeEndpointTaskMap = new ConcurrentHashMap<>();
 
     private final AtomicInteger numberOfSuccessResponse = new AtomicInteger(0);
 
@@ -108,7 +114,8 @@ public class ExternalRestDataService {
     @PostConstruct
     public void init() {
         LOGGER.info("Force collecting data for incomplete tasks of applications");
-        List<EndpointExecutionResult> executionResults = executionResultRepository.findByPercentCompleteLessThan(100);
+        List<EndpointExecutionResult> executionResults = executionResultRepository
+                .findByPercentCompleteLessThanAndState(100, ExecutionState.ACTIVE);
         Map<EndpointSettingVO, EndpointExecutionResult> incompleteTaskMap = executionResults
                 .stream()
                 .map(ExternalRestDataService::apply)
@@ -167,6 +174,7 @@ public class ExternalRestDataService {
         taskMgmtExecutorV1.execute(mainTaskEntry);
 
         LOGGER.info("Endpoint {} is added successfully", endpointSetting.getExtEndpoint());
+        activeEndpointTaskMap.put(endpointSetting.getTaskName(), taskMgmtExecutorV1);
         return endpointSetting.getId();
     }
 
@@ -182,7 +190,7 @@ public class ExternalRestDataService {
     private Callable<Object> getEndpointResponseTasks(
             EndpointSetting endpointSetting,
             EndpointSettingVO endpointSettingVO,
-            EndpointExecutionResult executionResult, 
+            EndpointExecutionResult executionResult,
             int numberOfCompletedTasks) {
 
         // Metadata
@@ -263,7 +271,7 @@ public class ExternalRestDataService {
 
         Optional<EndpointSetting> endpointSettingsOp = endpointSettingRepository.findById(endpointId);
         EndpointSetting endpointSetting = endpointSettingsOp
-                .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)));
+                .orElseThrow(() -> new EntityNotFoundException(ENDPOINT_ID_NOT_FOUND.formatted(endpointId)));
         Page<EndpointResponse> responses = endpointResponseRepository.
                 findByEndpointSetting(endpointSetting, pageable);
         return responses.map(EndpointResponse::toEndpointResponseVO);
@@ -286,7 +294,8 @@ public class ExternalRestDataService {
     @TimingMetricMonitor
     @Transactional
     public Page<EndpointSettingOverviewVO> getAllExtEndpoints(Pageable pageable) {
-        Page<EndpointSettingRepository.EndpointSettingOverview> endpointSettings = endpointSettingRepository.findEndpointSettingOverview(pageable);
+        Page<EndpointSettingRepository.EndpointSettingOverview> endpointSettings = 
+                endpointSettingRepository.findEndpointSettingOverview(pageable);
         return endpointSettings.map(p -> {
             EndpointSetting endpointSetting = p.getEndpointSetting();
             LocalDateTime createdAt = endpointSetting.getCreatedAt();
@@ -296,6 +305,7 @@ public class ExternalRestDataService {
                     .taskName(p.getTaskName())
                     .elapsedTime(p.getElapsedTime())
                     .targetURL(p.getTargetURL())
+                    .state(p.getState())
                     .numberOfCompletedTasks(p.getNumberOfCompletedTasks())
                     .numberOfResponses(p.getNumberOfResponses())
                     .createdAt(Objects.isNull(createdAt) ? "" : createdAt.format(DateTimeFormatter.ISO_DATE_TIME))
@@ -309,7 +319,7 @@ public class ExternalRestDataService {
 
         Optional<EndpointSetting> endpointSettingsOp = endpointSettingRepository.findById(endpointId);
         EndpointSetting endpointSetting = endpointSettingsOp
-                .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)));
+                .orElseThrow(() -> new EntityNotFoundException(ENDPOINT_ID_NOT_FOUND.formatted(endpointId)));
         executionResultRepository.deleteByEndpointSetting(endpointSetting);
         endpointSettingRepository.deleteById(endpointId);
         return true;
@@ -318,7 +328,46 @@ public class ExternalRestDataService {
     public EndpointSettingVO getEndpointSetting(Long endpointId) {
         Optional<EndpointSetting> endpointSettingsOp = endpointSettingRepository.findById(endpointId);
         return endpointSettingsOp
-                .orElseThrow(() -> new EntityNotFoundException("Endpoint ID %s is not found".formatted(endpointId)))
+                .orElseThrow(() -> new EntityNotFoundException(ENDPOINT_ID_NOT_FOUND.formatted(endpointId)))
                 .toEndpointSettingVO();
+    }
+
+    public void updateEndpointSetting(
+            Long endpointId,
+            PatchEndpointSettingVO patchEndpointSettingVO) {
+
+        ExecutionState nextExecutionState = patchEndpointSettingVO.getState();
+        Optional<EndpointSetting> endpointSettingsOp = endpointSettingRepository.findById(endpointId);
+        EndpointSetting endpointSetting = endpointSettingsOp
+                .orElseThrow(() -> new EntityNotFoundException(ENDPOINT_ID_NOT_FOUND.formatted(endpointId)));
+        EndpointExecutionResult executionResult = executionResultRepository.findByEndpointSetting(endpointSetting);
+        
+        if (executionResult.getState() == nextExecutionState) {
+            LOGGER.warn("Endpoint is already in state: {}. No need to do any action", nextExecutionState);
+            return;
+        }
+
+        executionResult.setState(nextExecutionState);
+        String application = endpointSetting.getApplication();
+        String taskName = endpointSetting.getTaskName();
+        if (nextExecutionState == ExecutionState.PAUSED) {
+            pauseEndpoint(application, taskName, executionResult);
+            LOGGER.info("Endpoint application: {} - {} has been paused successfully", application, taskName);
+            return;
+        }
+        throw new UnsupportedOperationException("Unsupported operation for " + patchEndpointSettingVO);
+    }
+
+    private void pauseEndpoint(
+            String application,
+            String taskName,
+            EndpointExecutionResult endpointExecutionResult) {
+        TaskMgmtService taskMgmtService = activeEndpointTaskMap.get(taskName);
+        TaskFactory.INSTANCE.destroy("TaskMgmtService", taskMgmtService);
+        TaskFactory.INSTANCE.destroy(application);
+        HttpClientFactory.INSTANCE.destroy(taskName);
+        endpointExecutionResult.setState(ExecutionState.PAUSED);
+        executionResultRepository.save(endpointExecutionResult);
+        activeEndpointTaskMap.remove(taskName);
     }
 }
