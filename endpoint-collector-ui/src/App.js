@@ -1,4 +1,4 @@
-import { Stack, ThemeProvider } from '@mui/material'
+import { Stack, ThemeProvider} from '@mui/material'
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -7,14 +7,23 @@ import ExtEndpointCreation from './components/ext-endpoints/ExtEndpointCreation'
 import ExtEndpointDetails from './components/ext-endpoints/ExtEndpointDetails'
 import ExtEndpointResponseDetails from './components/ext-endpoints/ExtEndpointResponseDetails'
 import ExtEndpointSummary from './components/ext-endpoints/ExtEndpointSummary'
-import { DEFAULT_THEME } from './components/GenericConstants'
+import { DARK_THEME, DEFAULT_THEME, LocalStorageService } from './components/GenericConstants'
 import PrimarySearchAppBar from './ResponsiveAppBar'
 
+const selectThemeStorageKey = "endpoint-collector-enable-dark-theme"
+
 function App () {
+  const [toggleDarkMode, setToggleDarkMode] = React.useState(LocalStorageService.getOrDefault(selectThemeStorageKey, false) === 'true');
+  const switchTheme = () => {
+    setToggleDarkMode((previous) => {
+      LocalStorageService.put(selectThemeStorageKey, !previous);
+      return !previous
+    })
+  }
   return (
-    <ThemeProvider theme={DEFAULT_THEME}>
-      <Stack spacing={4}>
-        <PrimarySearchAppBar />
+    <ThemeProvider theme={!toggleDarkMode ? DEFAULT_THEME : DARK_THEME}>
+      <Stack>
+        <PrimarySearchAppBar toggleDarkMode={toggleDarkMode} setToggleDarkMode={switchTheme}/>
         <Routes>
           <Route
             path='/'

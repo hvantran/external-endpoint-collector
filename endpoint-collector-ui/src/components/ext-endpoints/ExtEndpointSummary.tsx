@@ -236,6 +236,7 @@ const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [s
 
   let tableMetadata: TableMetadata = {
     columns,
+    tableContainerCssProps: {maxHeight: '100%'},
     name: "Endpoint Overview",
     onRowClickCallback: (row: ExtEndpointOverview) => navigate(`/endpoints/${row.endpointId}`),
     pagingOptions: pagingOptions,

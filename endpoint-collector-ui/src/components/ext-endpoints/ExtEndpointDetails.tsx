@@ -433,6 +433,7 @@ export default function ExtEndpointDetails() {
   let tableMetadata: TableMetadata = {
     columns,
     name: 'Response Values',
+    tableContainerCssProps: {maxHeight: '100%'},
     pagingOptions: pagingOptions,
     pagingResult: pagingResult
   }
