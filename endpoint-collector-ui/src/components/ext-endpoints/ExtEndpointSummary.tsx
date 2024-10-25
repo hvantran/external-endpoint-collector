@@ -40,11 +40,12 @@ export default function ExtEndpointSummary() {
   const [innerKey, setInnerKey] = React.useState(0);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
+  const [searchText, setSearchText] = React.useState("");
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-createdAt'))
 
-const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+  const restClient = React.useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
@@ -58,9 +59,9 @@ const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [s
   const columns: ColumnMetadata[] = [
     {
       id: 'endpointId',
-      label: 'Endpoint ID', 
+      label: 'Endpoint ID',
       isHidden: true,
-      minWidth: 100, 
+      minWidth: 100,
       isKeyColumn: true
     },
     {
@@ -69,10 +70,10 @@ const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [s
       minWidth: 100,
       isSortable: true
     },
-    { 
-      id: 'taskName', 
-      label: 'Task', 
-      minWidth: 50 ,
+    {
+      id: 'taskName',
+      label: 'Task',
+      minWidth: 50,
       format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />),
       isSortable: true
     },
@@ -145,22 +146,22 @@ const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [s
       align: 'right',
       actions: [
         {
-          actionIcon: <PlayCircleIcon/>,
+          actionIcon: <PlayCircleIcon />,
           visible: (row: any) => row.state === "PAUSED",
           actionLabel: "Resume",
           actionName: "resumeEndpoint",
           onClick: (row: ExtEndpointOverview) => () => {
-            EndpointBackendClient.update(row.endpointId, {state: 'ACTIVE'}, restClient);
+            EndpointBackendClient.update(row.endpointId, { state: 'ACTIVE' }, restClient);
             setInnerKey((previous: number) => previous + 1)
           }
         },
         {
-          actionIcon: <PauseCircleOutline/>,
+          actionIcon: <PauseCircleOutline />,
           visible: (row: any) => row.state === "ACTIVE",
           actionLabel: "Pause",
           actionName: "pauseEndpoint",
           onClick: (row: ExtEndpointOverview) => () => {
-            EndpointBackendClient.update(row.endpointId, {state: 'PAUSED'}, restClient);
+            EndpointBackendClient.update(row.endpointId, { state: 'PAUSED' }, restClient);
             setInnerKey((previous: number) => previous + 1)
           }
         },
@@ -222,6 +223,7 @@ const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [s
     pageIndex,
     pageSize,
     component: 'div',
+    searchText,
     orderBy,
     rowsPerPageOptions: [5, 10, 20],
     onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
@@ -236,7 +238,7 @@ const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [s
 
   let tableMetadata: TableMetadata = {
     columns,
-    tableContainerCssProps: {maxHeight: '100%'},
+    tableContainerCssProps: { maxHeight: '100%' },
     name: "Endpoint Overview",
     onRowClickCallback: (row: ExtEndpointOverview) => navigate(`/endpoints/${row.endpointId}`),
     pagingOptions: pagingOptions,

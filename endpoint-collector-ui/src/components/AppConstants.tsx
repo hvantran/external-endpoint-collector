@@ -136,6 +136,29 @@ export interface InputMetadata {
 }
 
 export class EndpointBackendClient {
+    static loadResponseSummaryAsync = async (
+        pageIndex: number, 
+        pageSize: number, 
+        orderBy: string, 
+        search: string,
+        restClient: RestClient, 
+        successCallback: (responsePaging: PagingResult) => void) =>{
+        
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+    
+            const targetURL = `${EXT_ENDPOINT_BACKEND_URL}/responses?pageIndex=${pageIndex}&pageSize=${pageSize}&orderBy=${orderBy}&search=${search}`;
+            await restClient.sendRequest(requestOptions, targetURL, async (response) => {
+                let responsePaging = await response.json() as PagingResult;
+                successCallback(responsePaging);
+                return { 'message': 'Load endpoints successfully!!', key: new Date().getTime() } as SnackbarMessage;
+            });
+    }
+
     static update = async(endpointId: number, endpointMetadata: PatchEndpointMetadata, restClient: RestClient) => {
         const requestOptions = {
             method: 'PUT',

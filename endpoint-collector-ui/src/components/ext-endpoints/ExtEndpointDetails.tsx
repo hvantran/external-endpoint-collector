@@ -40,6 +40,7 @@ export default function ExtEndpointDetails() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
+  const [searchText, setSearchText] = React.useState("")
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-column1'))
@@ -441,6 +442,7 @@ export default function ExtEndpointDetails() {
     pageIndex,
     pageSize,
     orderBy,
+    searchText,
     component: 'div',
     rowsPerPageOptions: [10, 50, 100, 500],
     onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {

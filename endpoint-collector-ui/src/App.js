@@ -6,6 +6,7 @@ import ErrorPage from './components/common/ErrorPage'
 import ExtEndpointCreation from './components/ext-endpoints/ExtEndpointCreation'
 import ExtEndpointDetails from './components/ext-endpoints/ExtEndpointDetails'
 import ExtEndpointResponseDetails from './components/ext-endpoints/ExtEndpointResponseDetails'
+import ExtResponseSummary from './components/ext-endpoints/ExtResponseSummary'
 import ExtEndpointSummary from './components/ext-endpoints/ExtEndpointSummary'
 import { DARK_THEME, DEFAULT_THEME, LocalStorageService } from './components/GenericConstants'
 import PrimarySearchAppBar from './ResponsiveAppBar'
@@ -33,6 +34,7 @@ function App () {
           >
           </Route>
           <Route path='/endpoints' element={<ExtEndpointSummary />}></Route>
+          <Route path='/responses' element={<ExtResponseSummary />}></Route>
           <Route
             path='/endpoints/new'
             element={<ExtEndpointCreation />}

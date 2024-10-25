@@ -1,6 +1,5 @@
 package com.hoatv.ext.endpoint.repositories;
 
-import com.hoatv.ext.endpoint.models.EndpointExecutionResult;
 import com.hoatv.ext.endpoint.models.EndpointSetting;
 import com.hoatv.ext.endpoint.models.ExecutionState;
 import jakarta.transaction.Transactional;

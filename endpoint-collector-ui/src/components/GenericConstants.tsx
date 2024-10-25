@@ -343,7 +343,8 @@ export interface PagingOptionMetadata {
     pageSize: number
     pageIndex: number
     orderBy: string
-    onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => void
+    searchText: string
+    onPageChange: (pageIndex: number, pageSize: number, orderBy: string, searchText: string) => void
 }
 
 export interface PagingResult {
