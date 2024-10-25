@@ -329,7 +329,7 @@ export default function ExtEndpointDetails() {
     },
     {
       propName: 'executorServiceType',
-      propLabel: 'Executor Service Type',
+      propLabel: 'Executor Service',
       propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
       propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
       disabled: true,
@@ -346,8 +346,27 @@ export default function ExtEndpointDetails() {
       }
     },
     {
+      propName: 'headers',
+      propLabel: 'Headers',
+      propValue: '{}',
+      disabled: true,
+      propDefaultValue: '{}',
+      layoutProperties: { xs: 12 },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
+      valueElementProperties: { xs: 10 },
+      propType: PropType.CodeEditor,
+      codeEditorMeta: {
+        height: '100px',
+        codeLanguges: [json()],
+        onChangeEvent: function (propName) {
+          return (value, _) => {
+          };
+        }
+      }
+    },
+    {
       propName: 'extEndpointData',
-      propLabel: 'Data',
+      propLabel: 'Body',
       propValue: '{}',
       propDefaultValue: '{}',
       disabled: true,
@@ -357,6 +376,7 @@ export default function ExtEndpointDetails() {
       isRequired: true,
       propType: PropType.CodeEditor,
       codeEditorMeta: {
+        height: '200px',
         codeLanguges: [json()],
         onChangeEvent: function (propName) {
           return (value, _) => { };
@@ -365,7 +385,7 @@ export default function ExtEndpointDetails() {
     },
     {
       propName: 'columnMetadata',
-      propLabel: 'Output column metadata',
+      propLabel: 'DB columns',
       propValue: '{}',
       propDefaultValue: '{}',
       disabled: true,

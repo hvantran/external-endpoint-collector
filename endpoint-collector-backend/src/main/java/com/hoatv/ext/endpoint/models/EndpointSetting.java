@@ -7,6 +7,7 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -37,6 +38,10 @@ public class EndpointSetting {
 
     @Column(length = 2048)
     private String data;
+
+    @Column(length = 2048)
+    @Convert(converter = StringMapConverter.class)
+    private Map<String, String> headers;
 
     @Column
     private Integer noAttemptTimes;
@@ -90,6 +95,7 @@ public class EndpointSetting {
                 .data(data)
                 .extEndpoint(extEndpoint)
                 .method(method)
+                .headers(headers)
                 .build();
         DataGeneratorInfoVO dataGeneratorInfo = DataGeneratorInfoVO.builder()
                 .generatorMethodName(generatorMethodName)
@@ -139,6 +145,7 @@ public class EndpointSetting {
                 .generatorStrategy(dataGeneratorInfo.getGeneratorStrategy())
                 .generatorMethodName(dataGeneratorInfo.getGeneratorMethodName())
                 .generatorSaltLength(dataGeneratorInfo.getGeneratorSaltLength())
+                .headers(requestInfo.getHeaders())
                 .generatorSaltStartWith(dataGeneratorInfo.getGeneratorSaltStartWith())
                 .successCriteria(filter.getSuccessCriteria())
                 .executorServiceType(input.getExecutorServiceType())

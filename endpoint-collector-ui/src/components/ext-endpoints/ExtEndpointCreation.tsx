@@ -255,7 +255,7 @@ export default function ActionCreation() {
     },
     {
       propName: 'executorServiceType',
-      propLabel: 'Executor Service Type',
+      propLabel: 'Executor Service',
       propValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
       propDefaultValue: 'EXECUTE_WITH_EXECUTOR_SERVICE',
       layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
@@ -275,8 +275,28 @@ export default function ActionCreation() {
       }
     },
     {
+      propName: 'headers',
+      propLabel: 'Headers',
+      propValue: '{}',
+      propDefaultValue: '{}',
+      layoutProperties: { xs: 12 },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
+      valueElementProperties: { xs: 10 },
+      propType: PropType.CodeEditor,
+      codeEditorMeta: {
+        height: '100px',
+        codeLanguges: [json()],
+        onChangeEvent: function (propName) {
+          return (value, _) => {
+            let propValue = value;
+            setStepMetadatas(onchangeStepDefault(propName, propValue));
+          };
+        }
+      }
+    },
+    {
       propName: 'extEndpointData',
-      propLabel: 'Data',
+      propLabel: 'Body',
       propValue: '{}',
       propDefaultValue: '{}',
       disabled: true,
@@ -286,6 +306,7 @@ export default function ActionCreation() {
       isRequired: true,
       propType: PropType.CodeEditor,
       codeEditorMeta: {
+        height: '200px',
         codeLanguges: [json()],
         onChangeEvent: function (propName) {
           return (value, _) => {
@@ -297,7 +318,7 @@ export default function ActionCreation() {
     },
     {
       propName: 'columnMetadata',
-      propLabel: 'Output column metadata',
+      propLabel: 'DB columns',
       propValue: '{}',
       propDefaultValue: '{}',
       disabled: true,
@@ -368,6 +389,7 @@ export default function ActionCreation() {
       let extEndpoint = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "extEndpoint")?.propValue;
       let method = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "extEndpointMethod")?.propValue;
       let data = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "extEndpointData")?.propValue;
+      let headers = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "headers")?.propValue;
       let columnMetadata = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "columnMetadata")?.propValue;
       let generatorSaltLength = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "generatorSaltLength")?.propValue;
       let generatorSaltStartWith = findStepPropertyByCondition(endpointMetadataMetadata, property => property.propName === "generatorSaltStartWith")?.propValue;
@@ -385,7 +407,8 @@ export default function ActionCreation() {
           requestInfo: {
             extEndpoint,
             method,
-            data
+            data,
+            headers: JSON.parse(headers)
           },
           columnMetadata,
           dataGeneratorInfo: {

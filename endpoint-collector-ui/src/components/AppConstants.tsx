@@ -79,6 +79,7 @@ export interface EndpointDetail {
       noParallelThread: number
       extEndpoint: string
       extEndpointMethod: string
+      headers: string | undefined
       generatorSaltLength: number
       generatorSaltStartWith: string
       generatorStrategy: string
@@ -116,6 +117,7 @@ export interface RequestInfoMeta {
     extEndpoint: string
     method: string
     data?: string
+    headers?: string
 }
 export interface RequestInfoMeta {
     extEndpoint: string
@@ -233,7 +235,8 @@ export class EndpointBackendClient {
                 responseConsumerType: endpointOutput.responseConsumerType,
                 executorServiceType: endpointInput.executorServiceType,
                 extEndpointData: endpointInput.requestInfo.data,
-                columnMetadata: endpointInput.columnMetadata
+                columnMetadata: endpointInput.columnMetadata,
+                headers: endpointInput.requestInfo.headers ? JSON.stringify(endpointInput.requestInfo.headers, null, 2) : undefined
             } 
             successCallback(endpointDetailMetadata);
             return { 'message': 'Load endpoint successfully!!', key: new Date().getTime() } as SnackbarMessage;
