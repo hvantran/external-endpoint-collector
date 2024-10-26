@@ -70,6 +70,7 @@ export default function TableRender(props: TableMetadata) {
                 >
                     {props.name}
                 </Typography>
+                {props.visibleSearchbar ? (
                 <Search>
                     <SearchIconWrapper>
                         <SearchIcon />
@@ -80,7 +81,7 @@ export default function TableRender(props: TableMetadata) {
                         onChange={handleSearchChange}
                         onBlur={handleBlurSearchChange}
                     />
-                </Search>
+                </Search>) : <></>}
             </Toolbar>
             <TableContainer sx={{ maxHeight: 640, ...tableContainerCssProps }}>
                 <Table stickyHeader aria-label="sticky table">

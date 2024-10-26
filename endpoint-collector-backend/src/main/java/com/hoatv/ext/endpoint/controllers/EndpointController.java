@@ -37,8 +37,9 @@ public class EndpointController {
         Sort.Direction direction = orderBy.startsWith("-") ? Sort.Direction.DESC : Sort.Direction.ASC;
         String sortByProperty = orderBy.replace("-", "");
         Sort defaultSorting = Sort.by(new Sort.Order(direction, sortByProperty));
+        PageRequest pageable = PageRequest.of(pageIndex, pageSize, defaultSorting);
         Page<EndpointSettingOverviewVO> allExtEndpoints =
-                externalRestDataService.getAllExtEndpoints(PageRequest.of(pageIndex, pageSize, defaultSorting));
+                externalRestDataService.getAllExtEndpoints(pageable);
         return ResponseEntity.ok(allExtEndpoints);
     }
 
@@ -87,8 +88,9 @@ public class EndpointController {
         Sort.Direction direction = orderBy.startsWith("-") ? Sort.Direction.DESC : Sort.Direction.ASC;
         String sortByProperty = orderBy.replace("-", "");
         Sort defaultSorting = Sort.by(new Sort.Order(direction, sortByProperty));
+        PageRequest pageable = PageRequest.of(pageIndex, pageSize, defaultSorting);
         Page<EndpointResponseVO> endpointResponses =
-                externalRestDataService.getEndpointResponses(endpointId, PageRequest.of(pageIndex, pageSize, defaultSorting));
+                externalRestDataService.getEndpointResponses(endpointId, pageable);
         return ResponseEntity.ok(endpointResponses);
     }
 }

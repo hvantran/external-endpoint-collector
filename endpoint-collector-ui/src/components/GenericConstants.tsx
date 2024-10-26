@@ -359,6 +359,7 @@ export interface TableMetadata {
     columns: Array<ColumnMetadata>
     pagingOptions: PagingOptionMetadata
     tableContainerCssProps?: any
+    visibleSearchbar?: boolean
     pagingResult: PagingResult
     onRowClickCallback?: (record: any) => any
     onMouseWheelClick?: (record: any) => any

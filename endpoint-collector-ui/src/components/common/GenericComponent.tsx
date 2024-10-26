@@ -34,10 +34,12 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    border: `1px solid ${theme.palette.divider}`, 
+    borderRadius: theme.shape.borderRadius, 
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: '20ch',
+      width: '40ch',
     },
   },
 }));

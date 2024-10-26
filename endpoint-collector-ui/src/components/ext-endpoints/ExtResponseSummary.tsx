@@ -149,6 +149,7 @@ export default function ExtResponseSummary() {
     let tableMetadata: TableMetadata = {
         columns,
         name: 'Response Overview',
+        visibleSearchbar: true,
         tableContainerCssProps: { maxHeight: '100%' },
         pagingOptions: pagingOptions,
         pagingResult: pagingResult

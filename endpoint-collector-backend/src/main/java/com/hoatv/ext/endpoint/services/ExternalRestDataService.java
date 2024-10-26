@@ -12,7 +12,7 @@ import com.hoatv.ext.endpoint.repositories.CustomEndpointResponseRepository;
 import com.hoatv.ext.endpoint.repositories.EndpointResponseRepository;
 import com.hoatv.ext.endpoint.repositories.EndpointSettingRepository;
 import com.hoatv.ext.endpoint.repositories.ExecutionResultRepository;
-import com.hoatv.ext.endpoint.utils.ExpressionUtils;
+import com.hoatv.ext.endpoint.utils.GenericSearchUtil;
 import com.hoatv.fwk.common.services.CheckedFunction;
 import com.hoatv.fwk.common.services.CheckedSupplier;
 import com.hoatv.fwk.common.services.HttpClientFactory;
@@ -32,16 +32,15 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.hoatv.ext.endpoint.utils.SaltGeneratorUtils.GeneratorType;
 import static com.hoatv.ext.endpoint.utils.SaltGeneratorUtils.getGeneratorMethodFunc;
@@ -116,7 +114,7 @@ public class ExternalRestDataService {
     @PostConstruct
     public void init() {
         LOGGER.info("Force collecting data for incomplete tasks of applications");
-        List<EndpointExecutionResult> executionResults = executionResultRepository
+        /*List<EndpointExecutionResult> executionResults = executionResultRepository
                 .findByPercentCompleteLessThanAndState(100, ExecutionState.ACTIVE);
         Map<EndpointSettingVO, EndpointExecutionResult> incompleteTaskMap = executionResults
                 .stream()
@@ -132,7 +130,7 @@ public class ExternalRestDataService {
             String lastRandomValue = getLastRandomValue(metadataVO, endpointSettingId, generatorSaltStartWith);
             int numberOfCompletedTasks = getNumberOfCompletedTasks(lastRandomValue, generatorSaltStartWith);
             collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult, numberOfCompletedTasks);
-        }));
+        }));*/
     }
 
     private MetadataVO getMetadataVO(String columnMetadata) {
@@ -288,19 +286,14 @@ public class ExternalRestDataService {
     @TimingMetricMonitor
     public Page<EndpointResponseVO> getEndpointResponses(TableSearchVO tableSearchVO, PageRequest pageable) {
         Page<EndpointResponse> responses = Optional.ofNullable(tableSearchVO)
-                .map(getEndpointResponseExample())
-                .map(example -> endpointResponseRepository.findAll(example, pageable))
+                .map(p -> {
+                    EndpointResponse endpointResponse = new EndpointResponse();
+                    return GenericSearchUtil.getSpecification(tableSearchVO, endpointResponse);
+                })
+                .map(specification -> endpointResponseRepository.findAll(specification, pageable))
                 .orElseGet(() -> endpointResponseRepository.findAll(pageable));
         return responses.map(EndpointResponse::toEndpointResponseVO);
     }
-
-    private CheckedFunction<TableSearchVO, Example<EndpointResponse>> getEndpointResponseExample() {
-        return tableSearchVO -> {
-            EndpointResponse endpointResponse = new EndpointResponse();
-            return ExpressionUtils.getExample(tableSearchVO, endpointResponse);
-        };
-    }
-
 
     @TimingMetricMonitor
     @Transactional
