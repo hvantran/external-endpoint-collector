@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.hoatv.ext.endpoint.utils.SaltGeneratorUtils.GeneratorType;
 import static com.hoatv.ext.endpoint.utils.SaltGeneratorUtils.getGeneratorMethodFunc;
@@ -114,7 +116,7 @@ public class ExternalRestDataService {
     @PostConstruct
     public void init() {
         LOGGER.info("Force collecting data for incomplete tasks of applications");
-        /*List<EndpointExecutionResult> executionResults = executionResultRepository
+        List<EndpointExecutionResult> executionResults = executionResultRepository
                 .findByPercentCompleteLessThanAndState(100, ExecutionState.ACTIVE);
         Map<EndpointSettingVO, EndpointExecutionResult> incompleteTaskMap = executionResults
                 .stream()
@@ -130,7 +132,7 @@ public class ExternalRestDataService {
             String lastRandomValue = getLastRandomValue(metadataVO, endpointSettingId, generatorSaltStartWith);
             int numberOfCompletedTasks = getNumberOfCompletedTasks(lastRandomValue, generatorSaltStartWith);
             collectDataFromEndpoint(endpointSettingVO, endpointSetting, executionResult, numberOfCompletedTasks);
-        }));*/
+        }));
     }
 
     private MetadataVO getMetadataVO(String columnMetadata) {
