@@ -33,7 +33,8 @@ public class GenericSearchUtil {
         GREATER_THAN_OR_EQUALS("$gte"),
         LESS_THAN("$lt"),
         LESS_THAN_OR_EQUALS("$lte"),
-        NOT_NULL("$notNull");
+        NOT_NULL("$notNull"),
+        IS_NULL("$null");
         
         private final String syntax;
         
@@ -81,6 +82,9 @@ public class GenericSearchUtil {
                     break;
                 case NOT_NULL:
                     predicates.add(criteriaBuilder.isNotNull(root.get(columnName)));
+                    break;
+                case IS_NULL:
+                    predicates.add(criteriaBuilder.isNull(root.get(columnName)));
                     break;
             }
             
