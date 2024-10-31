@@ -1,20 +1,18 @@
 package com.hoatv.ext.endpoint.utils;
 
+import com.hoatv.ext.endpoint.dtos.Expression;
 import com.hoatv.ext.endpoint.dtos.TableSearchVO;
 import com.hoatv.fwk.common.exceptions.AppException;
 import com.hoatv.fwk.common.services.CheckedConsumer;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GenericSearchUtil {
@@ -22,41 +20,18 @@ public class GenericSearchUtil {
 
     }
     
-    @Getter
-    @AllArgsConstructor
-    public enum Expression {
-        EXACT("$eq"),
-        CONTAINS("$contains"),
-        STARTS_WITH("$startsWith"),
-        ENDS_WITH("$endsWith"),
-        GREATER_THAN("$gt"),
-        GREATER_THAN_OR_EQUALS("$gte"),
-        LESS_THAN("$lt"),
-        LESS_THAN_OR_EQUALS("$lte"),
-        NOT_NULL("$notNull"),
-        IS_NULL("$null");
-        
-        private final String syntax;
-        
-        public static Expression of(String expressionName) {
-            return Arrays.stream(Expression.values()).filter(p -> p.getSyntax().equals(expressionName))
-                    .findFirst()
-                    .orElseThrow(() -> new AppException("Unsupported expression: " + expressionName));
-        }
-    }
 
     public static <T> Specification<T> getSpecification(TableSearchVO entry, T probe) {
         String columnName = entry.getColumnName();
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            String expressionName = entry.getExpression();
+            Expression expression = entry.getExpression();
             
             PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(probe.getClass(), columnName);
             if (descriptor == null || descriptor.getWriteMethod() == null) {
                 throw new AppException("Unsupported column or no setter for: " + columnName);
             }
             Object convertedValue = convertToFieldType(descriptor.getPropertyType(), entry.getSearchText());
-            Expression expression = Expression.of(expressionName);
             switch (expression) {
                 case EXACT, STARTS_WITH, ENDS_WITH, CONTAINS: {
                     CheckedConsumer<T> safeInvoke = instance -> descriptor.getWriteMethod().invoke(instance, convertedValue);

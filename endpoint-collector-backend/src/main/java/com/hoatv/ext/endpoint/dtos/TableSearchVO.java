@@ -13,7 +13,7 @@ public class TableSearchVO {
 
     private String columnName;
 
-    private String expression;
+    private Expression expression;
 
     private String searchText;
 
@@ -23,14 +23,14 @@ public class TableSearchVO {
         }
 
         String[] expressionParts = searchExpression.split(":");
-        if (expressionParts.length != 3) {
-            throw new AppException("Invalid search expression. Syntax must be <column>:<expression>:<text>");
+        if (expressionParts.length >= 2) {
+            Expression expression = Expression.of(expressionParts[1]);
+            expression.validate(searchExpression);
+            String columnName = expressionParts[0];
+            String searchValue = expressionParts.length == 2 ? "" : expressionParts[2];
+            return new TableSearchVO(columnName, expression, searchValue);
         }
-
-        String columnName = expressionParts[0];
-        String expression = expressionParts[1];
-        String value = expressionParts[2];
-        return new TableSearchVO(columnName, expression, value);
+        throw new AppException("Unsupported expression " + searchExpression + ". At least expression is <column>:<expression>");
     }
 
 }
