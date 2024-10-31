@@ -21,7 +21,6 @@ public enum Expression {
     NOT_NULL("$notNull") {
         @Override
         public void validate(String searchExpression) {
-            super.validate(searchExpression);
             String[] expressionParts = searchExpression.split(":");
             if (expressionParts.length != 2) {
                 throw new AppException("Invalid search expression. Syntax must be <column>:$notNull");
