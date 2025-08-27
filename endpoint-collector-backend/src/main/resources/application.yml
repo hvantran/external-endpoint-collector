@@ -1,0 +1,28 @@
+# Application configuration
+spring:
+  application:
+    name: ${ext.endpoint.collector.service.name}
+  profiles:
+    active: ${spring.profiles.active}
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+# Server configuration
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# SpringDoc configuration
+springdoc:
+  swagger-ui:
+    enabled: ${springdoc.swagger-ui.enabled}
+    path: /swagger-ui.html
+  api-docs:
+    enabled: ${springdoc.api-docs.enabled}
+  packages-to-scan: com.hoatv.ext.endpoint
