@@ -52,5 +52,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "@babel/core": "^7.22.0"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@codemirror|@lezer|@uiw|@marijn|w3c-keyname|style-mod)/)"
+    ]
   }
 }
