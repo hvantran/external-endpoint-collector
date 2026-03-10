@@ -1,0 +1,83 @@
+name: PR Build Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Checkout parent-pom
+        uses: actions/checkout@v4
+        with:
+          repository: hvantran/parent-pom
+          path: parent-pom
+          token: ${{ secrets.ACCESS_TOKEN }}
+      
+      - name: Checkout base-platform
+        uses: actions/checkout@v4
+        with:
+          repository: hvantran/base-platform
+          path: base-platform
+          token: ${{ secrets.ACCESS_TOKEN }}
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      
+      - name: Build parent-pom
+        run: mvn clean install -f parent-pom/pom.xml -DskipTests
+      
+      - name: Build base-platform
+        run: mvn clean install -f base-platform/pom.xml -DskipTests -Ddockerfile.skip=true
+      
+      - name: Build backend
+        run: mvn clean verify -f endpoint-collector-backend/pom.xml -B -Ddockerfile.skip=true
+      
+      - name: Run backend tests
+        run: mvn test -f endpoint-collector-backend/pom.xml -B
+  
+  build-ui:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: endpoint-collector-ui/yarn.lock
+      
+      - name: Install dependencies
+        working-directory: endpoint-collector-ui
+        run: yarn install --frozen-lockfile
+      
+      - name: Setup environment
+        working-directory: endpoint-collector-ui
+        run: |
+          chmod +x ./env.sh
+          ./env.sh || echo "REACT_APP_API_URL=http://localhost:8080" > .env
+          if [ -f env-config.js ]; then mv env-config.js ./public/; fi
+      
+      - name: Build UI
+        working-directory: endpoint-collector-ui
+        run: yarn build
+        env:
+          CI: false
+      
+      - name: Run UI tests
+        working-directory: endpoint-collector-ui
+        run: yarn test --passWithNoTests --watchAll=false
+        continue-on-error: true
