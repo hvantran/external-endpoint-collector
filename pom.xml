@@ -17,4 +17,25 @@
         <module>endpoint-collector-backend</module>
         <module>endpoint-collector-ui</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <!--
+                      Prevent CLI invocation of native:compile from attempting
+                      native-image generation in the aggregator module.
+                    -->
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <configuration>
+                            <skipNativeBuild>true</skipNativeBuild>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
