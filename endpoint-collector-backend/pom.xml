@@ -182,6 +182,7 @@
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
                         <configuration>
+                            <skipNativeBuild>false</skipNativeBuild>
                             <mainClass>${application.startup.class}</mainClass>
                             <imageName>external-endpoint-collector</imageName>
                             <fallback>false</fallback>
