@@ -16,7 +16,7 @@ public class CorsConfig {
 
                 registry.addMapping("/**")
                         .allowedMethods("*")
-                        .allowedOrigins("http://localhost:3001", "http://extendpointui.local:6086", "http://localhost:6086", "http://localhost:8070")
+                        .allowedOrigins("http://localhost:3001", "http://localhost:6086", "http://localhost:6086", "http://localhost:8070")
                         .allowedHeaders("*");
             }
         };
