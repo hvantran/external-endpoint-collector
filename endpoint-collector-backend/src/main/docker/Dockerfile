@@ -7,4 +7,4 @@ RUN java -Djarmode=layertools -jar ${project.build.finalName}.jar extract
 FROM tranvanhoa2810/base-image:latest as runtime
 # Second stage : Copy the extracted layers
 COPY --from=builder application/application/ ./
-CMD ["java", "-javaagent:elastic-apm-agent-${apm.agent.version}.jar","org.springframework.boot.loader.launch.JarLauncher"]
+CMD ["java", "org.springframework.boot.loader.launch.JarLauncher"]
