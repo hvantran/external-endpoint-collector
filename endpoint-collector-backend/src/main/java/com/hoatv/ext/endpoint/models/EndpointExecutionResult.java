@@ -9,6 +9,9 @@ import lombok.experimental.FieldNameConstants;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Entity
@@ -60,7 +63,9 @@ public class EndpointExecutionResult {
 
     @PreUpdate
     public void preUpdate() {
-        long elapsedTimeMillis = ChronoUnit.MILLIS.between(startedAt, LocalDateTime.now());
+        ZonedDateTime temporal1Inclusive = startedAt.atZone(ZoneOffset.UTC);
+        ZonedDateTime temporal2Exclusive = LocalDateTime.now().atZone(ZoneOffset.UTC);
+        long elapsedTimeMillis = ChronoUnit.MILLIS.between(temporal1Inclusive, temporal2Exclusive);
         elapsedTime = DurationFormatUtils.formatDuration(elapsedTimeMillis, "HH:mm:ss.S");
         if (percentComplete == 100) {
             endedAt = LocalDateTime.now();
