@@ -1,202 +1,60 @@
-
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PauseCircleOutline from '@mui/icons-material/PauseCircleOutline';
-import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import ReadMoreIcon from '@mui/icons-material/ReadMore';
-import RefreshIcon from '@mui/icons-material/Refresh';
-
-import { Stack } from '@mui/material';
-import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import { green, red } from '@mui/material/colors';
-import { Gauge } from '@mui/x-charts';
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EndpointBackendClient, ExtEndpointOverview, ROOT_BREADCRUMB } from '../AppConstants';
 import {
+  EntitySummaryTemplate,
+  ConfirmationDialog,
+  TextTruncate,
+  ProgressBar,
   ColumnMetadata,
-  LocalStorageService,
-  PageEntityMetadata,
-  PagingOptionMetadata,
-  PagingResult,
-  RestClient,
+  GenericActionMetadata,
   SpeedDialActionMetadata,
-  TableMetadata,
-  WithLink
+  PagingResult,
+} from '@hvantran/ui-component-library';
+import { PlayCircle, PauseCircle, Trash2, Eye, RefreshCw, PlusCircle } from 'lucide-react';
+import {
+  LocalStorageService,
+  RestClient,
 } from '../GenericConstants';
-import ProcessTracking from '../common/ProcessTracking';
-import TextTruncate from '../common/TextTruncate';
-import PageEntityRender from '../renders/PageEntityRender';
+import {
+  EndpointBackendClient,
+  ExtEndpointOverview,
+  ROOT_BREADCRUMB,
+} from '../AppConstants';
 
-
-const pageIndexStorageKey = "endpoint-collector-summary-table-page-index"
-const pageSizeStorageKey = "endpoint-collector-summary-table-page-size"
-const orderByStorageKey = "endpoint-collector-summary-table-order"
+const pageIndexStorageKey = 'endpoint-collector-summary-table-page-index';
+const pageSizeStorageKey = 'endpoint-collector-summary-table-page-size';
+const orderByStorageKey = 'endpoint-collector-summary-table-order';
 
 export default function ExtEndpointSummary() {
   const navigate = useNavigate();
-  const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const [innerKey, setInnerKey] = React.useState(0);
-  let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
-  const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [searchText, setSearchText] = React.useState("")
-  const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
-  const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
-  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-createdAt'))
+  const [processTracking, setCircleProcessOpen] = useState(false);
+  const initialPagingResult: PagingResult = { totalElements: 0, content: [] };
+  const [pagingResult, setPagingResult] = useState<PagingResult>(initialPagingResult);
+  const [searchText, setSearchText] = useState('');
+  const [pageIndex, setPageIndex] = useState(
+    parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0), 10)
+  );
+  const [pageSize, setPageSize] = useState(
+    parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10), 10)
+  );
+  const [orderBy, setOrderBy] = useState(
+    LocalStorageService.getOrDefault(orderByStorageKey, '-createdAt')
+  );
 
-  const restClient = React.useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+  const restClient = useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+  const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = useState(false);
+  const [confirmationDialogContent, setConfirmationDialogContent] = useState<React.ReactNode>(<p />);
+  const [confirmationDialogTitle, setConfirmationDialogTitle] = useState('');
+  const [confirmationDialogPositiveAction, setConfirmationDialogPositiveAction] = useState<() => void>(
+    () => () => {}
+  );
 
   const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" href='#'>
-      {ROOT_BREADCRUMB}
-    </Link>,
-    <Typography key="3" color="text.primary">
-      Summary
-    </Typography>
+    { label: ROOT_BREADCRUMB, href: '#' },
+    { label: 'Summary' },
   ];
 
-  const columns: ColumnMetadata[] = [
-    {
-      id: 'endpointId',
-      label: 'Endpoint ID',
-      isHidden: true,
-      minWidth: 100,
-      isKeyColumn: true
-    },
-    {
-      id: 'application',
-      label: 'Application',
-      minWidth: 100,
-      isSortable: true
-    },
-    {
-      id: 'taskName',
-      label: 'Task',
-      minWidth: 50,
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={50} />),
-      isSortable: true
-    },
-    {
-      id: 'targetURL',
-      label: 'Target URL',
-      minWidth: 100,
-      align: 'left',
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={20} />),
-      isSortable: true
-    },
-    {
-      id: 'state',
-      label: 'State',
-      minWidth: 20,
-      align: 'left',
-      isSortable: true
-    },
-    {
-      id: 'numberOfCompletedTasks',
-      label: 'No tasks',
-      minWidth: 100,
-      align: 'left',
-      isSortable: true
-    },
-    {
-      id: 'numberOfResponses',
-      label: 'No responses',
-      minWidth: 100,
-      align: 'left',
-      isSortable: true,
-      format: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    },
-    {
-      id: 'percentCompleted',
-      label: 'Percent',
-      minWidth: 100,
-      align: 'left',
-      isSortable: true,
-      format: (value: number) => (<Gauge
-        width={75}
-        height={75}
-        value={value}
-        startAngle={0}
-        endAngle={360}
-        innerRadius="60%"
-        outerRadius="100%"
-      />)
-    },
-    {
-      id: 'createdAt',
-      label: 'Created at',
-      minWidth: 100,
-      align: 'left',
-      isSortable: true,
-      format: (value: string) => value,
-    },
-    {
-      id: 'elapsedTime',
-      label: 'Elapsed time',
-      minWidth: 50,
-      align: 'left',
-      isSortable: true,
-      format: (value: string) => value,
-    },
-    {
-      id: 'actions',
-      label: '',
-      minWidth: 100,
-      align: 'right',
-      actions: [
-        {
-          actionIcon: <PlayCircleIcon />,
-          visible: (row: any) => row.state === "PAUSED",
-          actionLabel: "Resume",
-          actionName: "resumeEndpoint",
-          onClick: (row: ExtEndpointOverview) => () => {
-            EndpointBackendClient.update(row.endpointId, { state: 'ACTIVE' }, restClient);
-            setInnerKey((previous: number) => previous + 1)
-          }
-        },
-        {
-          actionIcon: <PauseCircleOutline />,
-          visible: (row: any) => row.state === "ACTIVE",
-          actionLabel: "Pause",
-          actionName: "pauseEndpoint",
-          onClick: (row: ExtEndpointOverview) => () => {
-            EndpointBackendClient.update(row.endpointId, { state: 'PAUSED' }, restClient);
-            setInnerKey((previous: number) => previous + 1)
-          }
-        },
-        {
-          actionIcon: <DeleteIcon />,
-          properties: { sx: { color: red[800] } },
-          actionLabel: "Delete endpoint",
-          actionName: "deletection",
-          onClick: (row: ExtEndpointOverview) => {
-            return () => {
-              EndpointBackendClient.deleteEndpointCollector(row.endpointId, restClient, () => {
-                EndpointBackendClient.loadEndpointSummaryAsync(
-                  pageIndex,
-                  pageSize,
-                  orderBy,
-                  restClient,
-                  (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
-                );
-              })
-            }
-          }
-        },
-        {
-          actionIcon: <ReadMoreIcon />,
-          actionLabel: "Action details",
-          actionName: "gotoActionDetail",
-          onClick: (row: ExtEndpointOverview) => {
-            return () => navigate(`/endpoints/${row.endpointId}`)
-          }
-        }
-      ]
-    }
-  ];
-
-  React.useEffect(() => {
+  const loadData = () => {
     EndpointBackendClient.loadEndpointSummaryAsync(
       pageIndex,
       pageSize,
@@ -204,73 +62,209 @@ export default function ExtEndpointSummary() {
       restClient,
       (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
     );
-  }, [pageIndex, pageSize, orderBy, searchText, restClient])
+  };
 
-  const endpoints: Array<SpeedDialActionMetadata> = [
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageIndex, pageSize, orderBy, searchText, restClient]);
+
+  const columns: ColumnMetadata[] = [
     {
-      actionIcon: WithLink('/endpoints/new', <AddCircleOutlineIcon />), actionName: 'create', actionLabel: 'New Endpoint', properties: {
-        sx: {
-          bgcolor: green[500],
-          '&:hover': {
-            bgcolor: green[800],
-          }
-        }
-      }
-    }
+      id: 'endpointId',
+      label: 'Endpoint ID',
+      isHidden: true,
+      minWidth: 100,
+      isKeyColumn: true,
+    },
+    {
+      id: 'application',
+      label: 'Application',
+      minWidth: 100,
+      isSortable: true,
+    },
+    {
+      id: 'taskName',
+      label: 'Task',
+      minWidth: 50,
+      format: (value: string) => <TextTruncate text={value || ''} maxTextLength={50} />,
+      isSortable: true,
+    },
+    {
+      id: 'targetURL',
+      label: 'Target URL',
+      minWidth: 100,
+      align: 'left',
+      format: (value: string) => <TextTruncate text={value || ''} maxTextLength={20} />,
+      isSortable: true,
+    },
+    {
+      id: 'state',
+      label: 'State',
+      minWidth: 20,
+      align: 'left',
+      isSortable: true,
+    },
+    {
+      id: 'numberOfCompletedTasks',
+      label: 'No tasks',
+      minWidth: 100,
+      align: 'left',
+      isSortable: true,
+    },
+    {
+      id: 'numberOfResponses',
+      label: 'No responses',
+      minWidth: 100,
+      align: 'left',
+      isSortable: true,
+      format: (value: number) => (value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0'),
+    },
+    {
+      id: 'percentCompleted',
+      label: 'Percent',
+      minWidth: 100,
+      align: 'left',
+      isSortable: true,
+      renderCell: (row: ExtEndpointOverview) => (
+        <div className="w-24">
+          <ProgressBar value={row.percentCompleted || 0} showPercentage={true} size="sm" />
+        </div>
+      ),
+    },
+    {
+      id: 'createdAt',
+      label: 'Created at',
+      minWidth: 100,
+      align: 'left',
+      isSortable: true,
+      format: (value: string) => value || '',
+    },
+    {
+      id: 'elapsedTime',
+      label: 'Elapsed time',
+      minWidth: 50,
+      align: 'left',
+      isSortable: true,
+      format: (value: string) => value || '',
+    },
+    {
+      id: 'actions',
+      label: '',
+      minWidth: 140,
+      align: 'right',
+      actions: [
+        {
+          actionIcon: <PlayCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
+          visible: (row: ExtEndpointOverview) => row.state === 'PAUSED',
+          actionLabel: 'Resume',
+          actionName: 'resumeEndpoint',
+          onClick: (row: ExtEndpointOverview) => async () => {
+            await EndpointBackendClient.update(row.endpointId, { state: 'ACTIVE' }, restClient);
+            loadData();
+          },
+        },
+        {
+          actionIcon: <PauseCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
+          visible: (row: ExtEndpointOverview) => row.state === 'ACTIVE',
+          actionLabel: 'Pause',
+          actionName: 'pauseEndpoint',
+          onClick: (row: ExtEndpointOverview) => async () => {
+            await EndpointBackendClient.update(row.endpointId, { state: 'PAUSED' }, restClient);
+            loadData();
+          },
+        },
+        {
+          actionIcon: <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
+          actionLabel: 'Delete endpoint',
+          actionName: 'deleteAction',
+          onClick: (row: ExtEndpointOverview) => () => {
+            setConfirmationDialogTitle('Delete Endpoint');
+            setConfirmationDialogContent(
+              <p>
+                Are you sure you want to delete <b>{row.application}</b> endpoint?
+              </p>
+            );
+            setConfirmationDialogPositiveAction(() => () => {
+              EndpointBackendClient.deleteEndpointCollector(row.endpointId, restClient, () => {
+                loadData();
+              });
+              setDeleteConfirmationDialogOpen(false);
+            });
+            setDeleteConfirmationDialogOpen(true);
+          },
+        },
+        {
+          actionIcon: <Eye className="w-4 h-4" />,
+          actionLabel: 'Action details',
+          actionName: 'gotoActionDetail',
+          onClick: (row: ExtEndpointOverview) => () => {
+            navigate(`/endpoints/${row.endpointId}`);
+          },
+        },
+      ],
+    },
   ];
 
-  let pagingOptions: PagingOptionMetadata = {
-    pageIndex,
-    pageSize,
-    component: 'div',
-    searchText,
-    orderBy,
-    rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number, orderBy: string, searchText: string) => {
-      setPageIndex(pageIndex);
-      setPageSize(pageSize);
-      setOrderBy(orderBy);
-      setSearchText(searchText);
-      LocalStorageService.put(pageIndexStorageKey, pageIndex)
-      LocalStorageService.put(pageSizeStorageKey, pageSize)
-      LocalStorageService.put(orderByStorageKey, orderBy)
-    }
-  }
+  const floatingActions: SpeedDialActionMetadata[] = [
+    {
+      actionIcon: <PlusCircle className="w-5 h-5" />,
+      actionName: 'create',
+      actionLabel: 'New Endpoint',
+      onClick: () => navigate('/endpoints/new'),
+    },
+  ];
 
-  let tableMetadata: TableMetadata = {
-    columns,
-    tableContainerCssProps: { maxHeight: '100%' },
-    name: "Endpoint Overview",
-    onRowClickCallback: (row: ExtEndpointOverview) => navigate(`/endpoints/${row.endpointId}`),
-    pagingOptions: pagingOptions,
-    pagingResult: pagingResult
-  }
-
-  let pageEntityMetadata: PageEntityMetadata = {
-    pageName: 'ext-endpoint-summary',
-    floatingActions: endpoints,
-    tableMetadata: tableMetadata,
-    breadcumbsMeta: breadcrumbs,
-    pageEntityActions: [
-      {
-        actionIcon: <RefreshIcon />,
-        actionLabel: "Refresh endpoints",
-        actionName: "refreshAction",
-        onClick: () => EndpointBackendClient.loadEndpointSummaryAsync(
-          pageIndex,
-          pageSize,
-          orderBy,
-          restClient,
-          (extEndpointPagingResult: PagingResult) => setPagingResult(extEndpointPagingResult)
-        )
-      }
-    ]
-  }
+  const headerActions: GenericActionMetadata[] = [
+    {
+      actionIcon: <RefreshCw className="w-4 h-4" />,
+      actionLabel: 'Refresh endpoints',
+      actionName: 'refreshAction',
+      onClick: () => loadData(),
+    },
+  ];
 
   return (
-    <Stack spacing={2} key={innerKey}>
-      <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
-      <ProcessTracking isLoading={processTracking}></ProcessTracking>
-    </Stack>
+    <>
+      <EntitySummaryTemplate<ExtEndpointOverview>
+        pageTitle="Endpoints"
+        breadcrumbs={breadcrumbs}
+        headerActions={headerActions}
+        floatingActions={floatingActions}
+        tableProps={{
+          name: 'Endpoint Overview',
+          columns,
+          keyColumn: 'endpointId',
+          loading: processTracking,
+          pagingResult,
+          pagingOptions: {
+            pageIndex,
+            pageSize,
+            orderBy,
+            searchText,
+            rowsPerPageOptions: [5, 10, 20],
+            onPageChange: (pIndex, pSize, pOrderBy, pSearch) => {
+              setPageIndex(pIndex);
+              setPageSize(pSize);
+              setOrderBy(pOrderBy);
+              setSearchText(pSearch);
+              LocalStorageService.put(pageIndexStorageKey, pIndex);
+              LocalStorageService.put(pageSizeStorageKey, pSize);
+              LocalStorageService.put(orderByStorageKey, pOrderBy);
+            },
+          },
+          onRowClickCallback: (row: ExtEndpointOverview) => navigate(`/endpoints/${row.endpointId}`),
+        }}
+      />
+      <ConfirmationDialog
+        open={deleteConfirmationDialogOpen}
+        title={confirmationDialogTitle}
+        content={confirmationDialogContent}
+        positiveText="Yes"
+        negativeText="No"
+        negativeAction={() => setDeleteConfirmationDialogOpen(false)}
+        positiveAction={confirmationDialogPositiveAction}
+      />
+    </>
   );
 }

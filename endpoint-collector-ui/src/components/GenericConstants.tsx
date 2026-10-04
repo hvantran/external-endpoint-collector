@@ -1,57 +1,11 @@
 import { LanguageSupport } from '@codemirror/language';
 import { ViewUpdate } from "@codemirror/view";
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteOwnerState, AutocompleteRenderGetTagProps, SelectChangeEvent, createTheme } from '@mui/material';
 import * as React from 'react';
 import { Link } from "react-router-dom";
 import { Slide, ToastOptions, toast } from 'react-toastify';
 
-export const DARK_THEME = createTheme({
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#90caf9',
-        },
-        secondary: {
-            main: '#f48fb1',
-        }
-    },
-    typography: {
-        fontSize: 13,
-        fontFamily: [
-            '-apple-system',
-            'BlinkMacSystemFont',
-            '"Segoe UI"',
-            'Roboto',
-            '"Helvetica Neue"',
-            'Arial',
-            'sans-serif',
-            '"Apple Color Emoji"',
-            '"Segoe UI Emoji"',
-            '"Segoe UI Symbol"',
-        ].join(','),
-    },
-});
-
-export const DEFAULT_THEME = createTheme({
-    palette: {
-        mode: 'light'
-    },
-    typography: {
-        fontSize: 13,
-        fontFamily: [
-            '-apple-system',
-            'BlinkMacSystemFont',
-            '"Segoe UI"',
-            'Roboto',
-            '"Helvetica Neue"',
-            'Arial',
-            'sans-serif',
-            '"Apple Color Emoji"',
-            '"Segoe UI Emoji"',
-            '"Segoe UI Symbol"',
-        ].join(','),
-    },
-});
+export const DARK_THEME = 'dark';
+export const DEFAULT_THEME = 'light';
 
 export function WithLink(to: any, children: any) {
     return <Link to={to}>{children}</Link>
@@ -255,18 +209,18 @@ export interface SelectionData {
 export interface SelectionMetadata {
     selections: Array<SelectionData>
     isMultiple?: boolean
-    onChangeEvent: (event: SelectChangeEvent, child: React.ReactNode) => void
+    onChangeEvent?: (event: any, child?: React.ReactNode) => void
 }
 
 export interface AutocompleteMeta {
-    renderTags?: ((value: any[], getTagProps: AutocompleteRenderGetTagProps, ownerState: AutocompleteOwnerState<any, boolean, false, false, "div">) => React.ReactNode) | undefined;
-    isOptionEqualToValue: ((option: any, value: any) => boolean) | undefined;
+    renderTags?: any;
+    isOptionEqualToValue?: ((option: any, value: any) => boolean);
     options: Array<any>
     isMultiple?: boolean
     filterSelectedOptions?: boolean
-    getOptionLabel: (option: any) => string
-    onChange: (event: React.SyntheticEvent, value: any, reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails) => void
-    onSearchTextChangeEvent: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> | undefined | any
+    getOptionLabel?: (option: any) => string
+    onChange?: (event: any, value: any, reason?: any, details?: any) => void
+    onSearchTextChangeEvent?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> | undefined | any
     limitTags?: number
     defaultValue?: Array<any>
 }
