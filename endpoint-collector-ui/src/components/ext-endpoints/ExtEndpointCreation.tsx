@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  WizardCreationTemplate,
+  ExtEndpointCreationTemplate,
   StepMetadata,
   PropertyMetadata,
   PropType,
@@ -355,7 +355,7 @@ export default function ExtEndpointCreation() {
           Clear sample
         </button>
       </div>
-      <WizardCreationTemplate
+      <ExtEndpointCreationTemplate
         pageTitle="Create Endpoint"
         breadcrumbs={breadcrumbs}
         steps={steps}

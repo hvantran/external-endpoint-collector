@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  EntitySummaryTemplate,
+  ExtEndpointSummaryTemplate,
   ConfirmationDialog,
   TextTruncate,
   ProgressBar,
@@ -226,7 +226,7 @@ export default function ExtEndpointSummary() {
 
   return (
     <>
-      <EntitySummaryTemplate<ExtEndpointOverview>
+      <ExtEndpointSummaryTemplate<ExtEndpointOverview>
         pageTitle="Endpoints"
         breadcrumbs={breadcrumbs}
         headerActions={headerActions}

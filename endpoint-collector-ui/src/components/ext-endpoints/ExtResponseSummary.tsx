@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  EntitySummaryTemplate,
+  ExtResponseSummaryTemplate,
   TextTruncate,
   ColumnMetadata,
   GenericActionMetadata,
@@ -144,7 +144,7 @@ export default function ExtResponseSummary() {
   ];
 
   return (
-    <EntitySummaryTemplate
+    <ExtResponseSummaryTemplate
       pageTitle="Responses"
       breadcrumbs={breadcrumbs}
       headerActions={headerActions}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { EntityDetailTemplate } from '@hvantran/ui-component-library';
+import { ExtEndpointResponseDetailsTemplate } from '@hvantran/ui-component-library';
 import { ROOT_BREADCRUMB } from '../AppConstants';
 
 export default function ExtEndpointResponseDetails() {
@@ -13,7 +13,7 @@ export default function ExtEndpointResponseDetails() {
   ];
 
   return (
-    <EntityDetailTemplate
+    <ExtEndpointResponseDetailsTemplate
       pageTitle={`Response ${response || ''}`}
       breadcrumbs={breadcrumbs}
       properties={[]}

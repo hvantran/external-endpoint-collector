@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  EntityDetailTemplate,
-  EntitySummaryTemplate,
+  ExtEndpointDetailsTemplate,
   PropertyMetadata,
   PropType,
   ColumnMetadata,
@@ -426,50 +425,37 @@ export default function ExtEndpointDetails() {
     },
   ];
 
-  if (activeTab === 'Responses') {
-    return (
-      <EntitySummaryTemplate
-        pageTitle={endpointSettingId}
-        breadcrumbs={breadcrumbs}
-        headerActions={headerActions}
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        tableProps={{
-          name: 'Response Values',
-          columns,
-          keyColumn: 'column1',
-          loading: processTracking,
-          pagingResult,
-          pagingOptions: {
-            pageIndex,
-            pageSize,
-            orderBy,
-            searchText,
-            rowsPerPageOptions: [10, 50, 100, 500],
-            onPageChange: (pIndex, pSize, pOrderBy, pSearch) => {
-              setPageIndex(pIndex);
-              setPageSize(pSize);
-              setOrderBy(pOrderBy);
-              setSearchText(pSearch);
-              LocalStorageService.put(pageIndexStorageKey, pIndex);
-              LocalStorageService.put(pageSizeStorageKey, pSize);
-              LocalStorageService.put(orderByStorageKey, pOrderBy);
-            },
-          },
-        }}
-      />
-    );
-  }
-
   return (
-    <EntityDetailTemplate
+    <ExtEndpointDetailsTemplate
       pageTitle={endpointSettingId}
       breadcrumbs={breadcrumbs}
       headerActions={headerActions}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      tableProps={{
+        name: 'Response Values',
+        columns,
+        keyColumn: 'column1',
+        loading: processTracking,
+        pagingResult,
+        pagingOptions: {
+          pageIndex,
+          pageSize,
+          orderBy,
+          searchText,
+          rowsPerPageOptions: [10, 50, 100, 500],
+          onPageChange: (pIndex, pSize, pOrderBy, pSearch) => {
+            setPageIndex(pIndex);
+            setPageSize(pSize);
+            setOrderBy(pOrderBy);
+            setSearchText(pSearch);
+            LocalStorageService.put(pageIndexStorageKey, pIndex);
+            LocalStorageService.put(pageSizeStorageKey, pSize);
+            LocalStorageService.put(orderByStorageKey, pOrderBy);
+          },
+        },
+      }}
       properties={propertyMetadata}
       onPropertyChange={(propName, value) => {
         setPropertyMetadata((prev) =>
