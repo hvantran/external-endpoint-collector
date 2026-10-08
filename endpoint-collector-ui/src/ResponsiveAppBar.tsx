@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AppSwitcher, AppSwitcherItem, AppTopBar, SearchBar } from '@hvantran/ui-component-library';
-import { User } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 
 const APP_ENVIRONMENT_VARIABLES = (window as any)._env_ || {};
 
@@ -21,6 +21,27 @@ export default function PrimarySearchAppBar({
   setToggleDarkMode,
 }: ResponsiveAppBarProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    const gatewayBaseUrl =
+      APP_ENVIRONMENT_VARIABLES.REACT_APP_GATEWAY_URL ||
+      APP_ENVIRONMENT_VARIABLES.REACT_APP_ENDPOINT_MANAGER_BACKEND_URL?.replace('/api/ext-endpoint-collector', '') ||
+      'http://localhost:6081';
+    const redirectUri = encodeURIComponent(window.location.origin);
+    window.location.href = `${gatewayBaseUrl}/logout?redirect_uri=${redirectUri}`;
+  };
 
   const platformApps: AppSwitcherItem[] = [
     {
@@ -59,6 +80,33 @@ export default function PrimarySearchAppBar({
     />
   );
 
+  const userProfile = (
+    <div className="relative" ref={profileRef}>
+      <button
+        type="button"
+        title="User menu"
+        aria-label="User menu"
+        onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+        className="p-2 rounded-btn text-secondary-500 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors cursor-pointer"
+      >
+        <User className="w-5 h-5" />
+      </button>
+
+      {isProfileMenuOpen && (
+        <div className="absolute right-0 mt-2 w-48 p-2 rounded-xl border border-secondary-200 dark:border-secondary-800 bg-surface-card-light dark:bg-surface-card-dark shadow-xl z-50">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40 rounded-lg transition-colors text-left"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
       <AppTopBar
@@ -94,11 +142,7 @@ export default function PrimarySearchAppBar({
           </div>
         }
         actionsSlot={appSwitcher}
-        userSlot={
-          <div className="p-2 rounded-btn text-secondary-500 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors cursor-pointer">
-            <User className="w-5 h-5" />
-          </div>
-        }
+        userSlot={userProfile}
       />
 
       {/* Mobile nav dropdown */}
