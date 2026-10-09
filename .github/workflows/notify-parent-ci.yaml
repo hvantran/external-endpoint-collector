@@ -1,4 +1,3 @@
-
 name: send-submodule-updates-to-parent-repo-ci
 
 on:
@@ -8,7 +7,31 @@ on:
   workflow_dispatch:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      ui: ${{ steps.filter.outputs.ui }}
+    steps:
+      - uses: actions/checkout@v4
+      - languages: null
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
+          filters: |
+            backend:
+              - 'endpoint-collector-backend/**'
+              - 'pom.xml'
+              - '.github/workflows/**'
+            ui:
+              - 'endpoint-collector-ui/**'
+              - '.github/workflows/**'
+
   Update:
+    needs: changes
     runs-on: ubuntu-latest
 
     steps:
@@ -26,15 +49,16 @@ jobs:
       - name: Commit
         run: |
           git config user.email "tranvanhoactk34@gmail.com"
-          git config user.name "GitHub Actions - update endpoint-collector-app submodule"
+          git config user.name "GitHub Actions - update external-endpoint-collector submodule"
           git add --all
-          git commit -m "Update endpoint-collector-app submodules" || echo "No changes to commit"
+          git commit -m "Update external-endpoint-collector submodules" || echo "No changes to commit"
       - uses: nick-fields/retry@v2
         with:
           timeout_seconds: 15
           max_attempts: 5
           command: git pull --rebase && git push
       - name: Github REST API Call to make endpoint-collector-backend-ci service build
+        if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.backend == 'true' }}
         env:
           CI_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           PARENT_REPO: project-management
@@ -43,6 +67,7 @@ jobs:
         run: |
           curl -fL --retry 3 -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ env.CI_TOKEN }}" https://api.github.com/repos/hvantran/${{ env.PARENT_REPO }}/actions/workflows/${{ env.WORKFLOW_ID }}/dispatches -d '{"ref":"${{ env.PARENT_BRANCH }}"}'
       - name: Github REST API Call to make endpoint-collector-ui-ci service build
+        if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.ui == 'true' }}
         env:
           CI_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           PARENT_REPO: project-management
@@ -50,5 +75,3 @@ jobs:
           WORKFLOW_ID: endpoint-collector-ui-ci.yaml
         run: |
           curl -fL --retry 3 -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ env.CI_TOKEN }}" https://api.github.com/repos/hvantran/${{ env.PARENT_REPO }}/actions/workflows/${{ env.WORKFLOW_ID }}/dispatches -d '{"ref":"${{ env.PARENT_BRANCH }}"}'
-
-
