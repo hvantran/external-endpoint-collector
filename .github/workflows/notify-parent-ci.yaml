@@ -16,7 +16,6 @@ jobs:
       ui: ${{ steps.filter.outputs.ui }}
     steps:
       - uses: actions/checkout@v4
-      - languages: null
       - uses: dorny/paths-filter@v3
         id: filter
         with:
